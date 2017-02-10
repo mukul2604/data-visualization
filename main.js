@@ -13,6 +13,8 @@ var ageBins, wageBins, experBins;
 var typeHist = 'age';
 var dataPath ='data/CPS85.csv';
 
+var toolTip;
+
 
 // d3.csv(dataPath, function (error,data) {
 // 	if (error) {
@@ -46,7 +48,7 @@ function initMain() {
 function initCanvas() {
 	// set the dimensions and margins of the graph
 	// set the ranges
-	svg_margin = {top: 10, right: 30, bottom: 30, left: 40};
+	svg_margin = {top: 100, right: 30, bottom: 30, left: 200};
     svg_width = canvasWidth - svg_margin.left - svg_margin.right;
     svg_height = canvasHeight - svg_margin.top - svg_margin.bottom;
 
@@ -56,12 +58,19 @@ function initCanvas() {
 		  	.append("g")
 		    .attr("transform", 
 		          "translate(" + svg_margin.left + "," + svg_margin.top + ")");
+
+	toolTip = d3.tip()
+      			.attr("class", "d3-tip")
+      			.offset([-8, 0])
+      			.html(function(d) { return "<span style='color:red'>" + d + "</span>" });
+    canvas.call(toolTip);
+    // d3.select("body").append("div").attr("class", "toolTip");
 }
 
 function initCommonHist() {	
 
 	xScaleAge   = d3.scaleLinear()
-	          		.domain([15, d3.max(dataAge, function(d){return d;})])
+	          		.domain([15, 10 + d3.max(dataAge, function(d){return d;})])
 	          		.range([0, svg_width]);
 
 	xScaleWage  = d3.scaleLinear()
@@ -118,33 +127,21 @@ function initHistogram () {
 		yScale = yScaleExper;
 		bins =  experBins;
 	}
-	
-  	var grpRect = canvas.selectAll("rect")
+
+  	var grpHist = canvas.selectAll(".bar")
       				.data(bins)
-    				.enter();
-    				
-    			
+    				.enter();  						
 
-    grpRect.append("rect")
-    				.attr("fill", "blue")
-	    			.attr("x", whiteSpace)
-	    			.attr("transform", function(d) {
-			  			return "translate(" + xScale(d.x0) + "," + yScale(d.length) + ")"; })
-	    			.attr("width", function(d) { return xScale(d.x1) - xScale(d.x0) - 2 * whiteSpace; })
-	    			.attr("height", function(d) { return svg_height - yScale(d.length); })
-	    			.on("mouseover", handleMouseOver)
-	    			.on("mouseout", handleMouseOut);
-
-	// grp.append("text")
-	// 		.attr("transform", function(d){return "translate(" + xScale(d.x0) + "," + yScale(d.length) + ")";})
- 	//           .style("fill", "black")
-	 //           .style("font-size", "14px")          	
- 	//           .attr("x", function (d) { return (xScale(d.x1) - xScale(d.x0) -1 )/ 2; })
- 	//           .attr("y", function (d) { return yScale(d.length); })
- 	//           .style("style", "label")
- 	//           .text(function (d) { return d.length; });
-
-
+    grpHist.append("rect")
+    		.attr("fill", "orange")
+	    	.attr("x", whiteSpace)
+	    	.attr("transform", function(d) {
+					return "translate(" + xScale(d.x0) + "," + yScale(d.length) + ")"; })
+	    	.attr("width", function(d) { return xScale(d.x1) - xScale(d.x0) - 2 * whiteSpace; })
+	    	.attr("height", function(d) { return svg_height - yScale(d.length); })
+	    	//.on('mouseover', toolTip.show)
+	    	.on("mouseover", handleMouseOver)
+	    	.on("mouseout", handleMouseOut);
 
 	canvas.append("g")
       .attr("transform", "translate(0," + svg_height + ")")
@@ -152,24 +149,19 @@ function initHistogram () {
 
   	// add the y Axis
 	canvas.append("g")
-      .call(d3.axisLeft(yScale));
-      
+      .call(d3.axisLeft(yScale));     
 
 }
 
 
 function handleMouseOver(d) {  // Add interactivity
-	// Use D3 to select element, change color and size
-	console.log(this);
+	toolTip.show(d.length);
     var bar = d3.select(this);
-    bar.append("g").append("text").text("hone");
     bar.transition()
     	.delay(100)
     	.attr("x", -1*whiteSpace)
-    	.attr("fill", "orange")
-       	.attr("width", function(d) { return xScaleAge(d.x1) - xScaleAge(d.x0) + 2*whiteSpace;});
-        
-                       
+    	.attr("fill", "orangered")
+       	.attr("width", function(d) { return xScaleAge(d.x1) - xScaleAge(d.x0) + 2*whiteSpace;}); 
 }
 
 function handleMouseOut(d) {
@@ -177,15 +169,13 @@ function handleMouseOut(d) {
 	bar.transition()
 		.delay(100)
 		.attr("x", whiteSpace)
-		.attr("fill", "blue")
+		.attr("fill", "orange")
 		.attr("width", function(d) { return xScaleAge(d.x1) - xScaleAge(d.x0) - 2 *whiteSpace ; })
 	    .attr("height", function(d) { return svg_height - yScaleAge(d.length); });
+
+	toolTip.hide();
 }
 
-//vizHistogram();
-  // add the x Axis
-
-// });
 
 
 
