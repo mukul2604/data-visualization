@@ -4,7 +4,7 @@ var dataExper = []
 var canvas;
 var canvasWidth = 960;
 var canvasHeight = 500;
-var whiteSpace = 4
+var whiteSpace = 2
 var xScaleAge, yScaleAge, 
 	xScaleWage, yScaleWage, 
 	xScaleExper, yScaleExper;
@@ -12,19 +12,7 @@ var svg_margin, svg_width, svg_height;
 var ageBins, wageBins, experBins;
 var typeHist = 'age';
 var dataPath ='data/CPS85.csv';
-
 var toolTip;
-
-
-// d3.csv(dataPath, function (error,data) {
-// 	if (error) {
-// 		console.log(error);
-// 	} else {
-// 		dataAge = data.map( function(i) {return parseInt(i.age);});	
-// 	}
-// });
-
-
 
 // get the data
 d3.csv(dataPath, function(error, data) {
@@ -70,7 +58,7 @@ function initCanvas() {
 function initCommonHist() {	
 
 	xScaleAge   = d3.scaleLinear()
-	          		.domain([15, 10 + d3.max(dataAge, function(d){return d;})])
+	          		.domain([15, 5+d3.max(dataAge, function(d){return d;})])
 	          		.range([0, svg_width]);
 
 	xScaleWage  = d3.scaleLinear()
@@ -110,7 +98,6 @@ function initCommonHist() {
 }
 
 function initHistogram () {	
-	//console.log(dataAge);
 	var xScale, yScale, bins;
 	var ticksHist = 20;
 
@@ -136,16 +123,24 @@ function initHistogram () {
     		.attr("fill", "orange")
 	    	.attr("x", whiteSpace)
 	    	.attr("transform", function(d) {
-					return "translate(" + xScale(d.x0) + "," + yScale(d.length) + ")"; })
-	    	.attr("width", function(d) { return xScale(d.x1) - xScale(d.x0) - 2 * whiteSpace; })
-	    	.attr("height", function(d) { return svg_height - yScale(d.length); })
-	    	//.on('mouseover', toolTip.show)
+				return "translate(" + xScale(d.x0) + "," + yScale(d.length) + ")"; })
+	    	.attr("width", function(d) { 
+	    		return xScale(d.x1) - xScale(d.x0) - 2 * whiteSpace; })
+	    	.attr("height", function(d) { 
+	    		return svg_height - yScale(d.length); })
 	    	.on("mouseover", handleMouseOver)
 	    	.on("mouseout", handleMouseOut);
 
 	canvas.append("g")
       .attr("transform", "translate(0," + svg_height + ")")
       .call(d3.axisBottom(xScale));
+
+    canvas.append("g").append("text")             
+      .attr("transform",
+            "translate(" + (svg_width/2) + " ," + 
+                           (svg_height + svg_margin.top + 20) + ")")
+      .style("text-anchor", "middle")
+      .text("Age in years");
 
   	// add the y Axis
 	canvas.append("g")
@@ -155,13 +150,14 @@ function initHistogram () {
 
 
 function handleMouseOver(d) {  // Add interactivity
-	toolTip.show(d.length);
+	
     var bar = d3.select(this);
     bar.transition()
     	.delay(100)
     	.attr("x", -1*whiteSpace)
     	.attr("fill", "orangered")
        	.attr("width", function(d) { return xScaleAge(d.x1) - xScaleAge(d.x0) + 2*whiteSpace;}); 
+    toolTip.show(d.length);
 }
 
 function handleMouseOut(d) {
