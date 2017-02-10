@@ -66,12 +66,12 @@ function initCommonHist() {
 	          		.range([0, svg_width]);
 
 	xScaleWage  = d3.scaleLinear()
-					.domain([d3.min(dataWage, function(d) {return d;}) - 2, 
+					.domain([d3.min(dataWage, function(d) {return d;}) - padding/2, 
 							padding+d3.max(dataWage, function(d){return d;})])
 					.range([0, svg_width]);
 
 	xScaleExper = d3.scaleLinear()
-					.domain([d3.min(dataExper, function(d) {return d;}),
+					.domain([d3.min(dataExper, function(d) {return d;}) - padding/2,
 							 padding+d3.max(dataExper, function(d){return d;})])
 					.range([0, svg_width]);
 	
