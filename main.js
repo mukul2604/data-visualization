@@ -4,7 +4,7 @@ var dataExper = []
 var canvas;
 var canvasWidth = 960;
 var canvasHeight = 500;
-var barPadding = 4
+var whiteSpace = 4
 var xScaleAge, yScaleAge, 
 	xScaleWage, yScaleWage, 
 	xScaleExper, yScaleExper;
@@ -119,21 +119,32 @@ function initHistogram () {
 		bins =  experBins;
 	}
 	
-  	var rectgrp = canvas.selectAll("rect")
-      			.data(bins)
-    			.enter()
-    				.append("g")
-    				.append("rect");
+  	var grpRect = canvas.selectAll("rect")
+      				.data(bins)
+    				.enter();
+    				
+    			
 
-    var rect = rectgrp.attr("class", "bar")
-	    			.attr("fill", "blue")
+    grpRect.append("rect")
+    				.attr("fill", "blue")
+	    			.attr("x", whiteSpace)
 	    			.attr("transform", function(d) {
 			  			return "translate(" + xScale(d.x0) + "," + yScale(d.length) + ")"; })
-	    			.attr("width", function(d) { return xScale(d.x1) - xScale(d.x0) - 1 ; })
-	    			.attr("height", function(d) { return svg_height - yScale(d.length); });
+	    			.attr("width", function(d) { return xScale(d.x1) - xScale(d.x0) - 2 * whiteSpace; })
+	    			.attr("height", function(d) { return svg_height - yScale(d.length); })
+	    			.on("mouseover", handleMouseOver)
+	    			.on("mouseout", handleMouseOut);
 
-	rect.on("mouseover", handleMouseOver)
-	    .on("mouseout", handleMouseOut);
+	// grp.append("text")
+	// 		.attr("transform", function(d){return "translate(" + xScale(d.x0) + "," + yScale(d.length) + ")";})
+ 	//           .style("fill", "black")
+	 //           .style("font-size", "14px")          	
+ 	//           .attr("x", function (d) { return (xScale(d.x1) - xScale(d.x0) -1 )/ 2; })
+ 	//           .attr("y", function (d) { return yScale(d.length); })
+ 	//           .style("style", "label")
+ 	//           .text(function (d) { return d.length; });
+
+
 
 	canvas.append("g")
       .attr("transform", "translate(0," + svg_height + ")")
@@ -147,20 +158,28 @@ function initHistogram () {
 }
 
 
-function handleMouseOver(d, i) {  // Add interactivity
-			console.log("fsdf");
-            // Use D3 to select element, change color and size
-           d3.select(this).attr("fill", "orange")
-           	.attr("width", function(d) { return xScaleAge(d.x1) - xScaleAge(d.x0) + 10;})
-            .attr('x',-1*barPadding)
-           	.attr("text", "d");
-             
+function handleMouseOver(d) {  // Add interactivity
+	// Use D3 to select element, change color and size
+	console.log(this);
+    var bar = d3.select(this);
+    bar.append("g").append("text").text("hone");
+    bar.transition()
+    	.delay(100)
+    	.attr("x", -1*whiteSpace)
+    	.attr("fill", "orange")
+       	.attr("width", function(d) { return xScaleAge(d.x1) - xScaleAge(d.x0) + 2*whiteSpace;});
+        
+                       
 }
 
-function handleMouseOut(d,i) {
-		d3.select(this).attr("fill", "blue")
-			.attr("width", function(d) { return xScaleAge(d.x1) - xScaleAge(d.x0) -1 ; })
-	      	.attr("height", function(d) { return svg_height - yScaleAge(d.length); });
+function handleMouseOut(d) {
+	var bar = d3.select(this);
+	bar.transition()
+		.delay(100)
+		.attr("x", whiteSpace)
+		.attr("fill", "blue")
+		.attr("width", function(d) { return xScaleAge(d.x1) - xScaleAge(d.x0) - 2 *whiteSpace ; })
+	    .attr("height", function(d) { return svg_height - yScaleAge(d.length); });
 }
 
 //vizHistogram();
