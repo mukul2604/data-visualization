@@ -120,7 +120,7 @@ function initHistogram () {
     				.enter();  						
 
     grpHist.append("rect")
-    		.attr("fill", "orange")
+    		.attr("fill", "olive")
 	    	.attr("x", whiteSpace)
 	    	.attr("transform", function(d) {
 				return "translate(" + xScale(d.x0) + "," + yScale(d.length) + ")"; })
@@ -153,7 +153,7 @@ function handleMouseOver(d) {  // Add interactivity
 	
     var bar = d3.select(this);
     bar.transition()
-    	.delay(100)
+    	.delay(170)
     	.attr("x", -1*whiteSpace)
     	.attr("fill", "orangered")
        	.attr("width", function(d) { return xScaleAge(d.x1) - xScaleAge(d.x0) + 2*whiteSpace;}); 
@@ -163,9 +163,9 @@ function handleMouseOver(d) {  // Add interactivity
 function handleMouseOut(d) {
 	var bar = d3.select(this);
 	bar.transition()
-		.delay(100)
+		.delay(170)
 		.attr("x", whiteSpace)
-		.attr("fill", "orange")
+		.attr("fill", "olive")
 		.attr("width", function(d) { return xScaleAge(d.x1) - xScaleAge(d.x0) - 2 *whiteSpace ; })
 	    .attr("height", function(d) { return svg_height - yScaleAge(d.length); });
 
