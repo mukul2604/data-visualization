@@ -20,10 +20,12 @@ d3.csv(dataPath, function(error, data) {
 
 	data.forEach(function(d) {
 	    dataAge.push(parseInt(d.age));
-	    dataWage.push(parseInt(d.wage));
+	    dataWage.push(parseFloat(d.wage));
 	    dataExper.push(parseInt(d.exper));
 	});
-
+	// console.log(dataAge);
+	// console.log(dataWage);
+	// console.log(dataExper);
 	initMain();
 });
 
@@ -57,16 +59,20 @@ function initCanvas() {
 
 function initCommonHist() {	
 
+	var padding = 5;
 	xScaleAge   = d3.scaleLinear()
-	          		.domain([15, 5+d3.max(dataAge, function(d){return d;})])
+	          		.domain([d3.min(dataAge, function(d){return d;}) - padding, 
+	          			padding+d3.max(dataAge, function(d){return d;})])
 	          		.range([0, svg_width]);
 
 	xScaleWage  = d3.scaleLinear()
-					.domain([0, d3.max(dataWage, function(d){return d;})])
+					.domain([d3.min(dataWage, function(d) {return d;}) - 2, 
+							padding+d3.max(dataWage, function(d){return d;})])
 					.range([0, svg_width]);
 
 	xScaleExper = d3.scaleLinear()
-					.domain([0, d3.max(dataExper, function(d){return d;})])
+					.domain([d3.min(dataExper, function(d) {return d;}),
+							 padding+d3.max(dataExper, function(d){return d;})])
 					.range([0, svg_width]);
 	
 	ageBins 	= d3.histogram()
@@ -99,7 +105,7 @@ function initCommonHist() {
 
 function initHistogram () {	
 	var xScale, yScale, bins;
-	var ticksHist = 20;
+	// var ticksHist = 20;
 
 	if (typeHist == 'age') {
 		xScale = xScaleAge;
@@ -109,7 +115,7 @@ function initHistogram () {
 		xScale = xScaleWage;
 		yScale = yScaleWage;
 		bins =  wageBins;
-	} else if (typeHist == 'experience') {
+	} else if (typeHist == 'exper') {
 		xScale = xScaleExper;
 		yScale = yScaleExper;
 		bins =  experBins;
@@ -120,7 +126,7 @@ function initHistogram () {
     				.enter();  						
 
     grpHist.append("rect")
-    		.attr("fill", "olive")
+    		.attr("fill", "lightblue")
 	    	.attr("x", whiteSpace)
 	    	.attr("transform", function(d) {
 				return "translate(" + xScale(d.x0) + "," + yScale(d.length) + ")"; })
@@ -152,11 +158,23 @@ function initHistogram () {
 function handleMouseOver(d) {  // Add interactivity
 	
     var bar = d3.select(this);
+
+	if (typeHist == 'age') {
+		xScale = xScaleAge;
+		yScale = yScaleAge;
+	} else if (typeHist == 'wage') {
+		xScale = xScaleWage;
+		yScale = yScaleWage;
+	} else if (typeHist == 'exper') {
+		xScale = xScaleExper;
+		yScale = yScaleExper;
+	}
+
     bar.transition()
     	.delay(170)
     	.attr("x", -1*whiteSpace)
     	.attr("fill", "orangered")
-       	.attr("width", function(d) { return xScaleAge(d.x1) - xScaleAge(d.x0) + 2*whiteSpace;}); 
+       	.attr("width", function(d) { return xScale(d.x1) - xScale(d.x0) + 2*whiteSpace;}); 
     toolTip.show(d.length);
 }
 
@@ -165,9 +183,9 @@ function handleMouseOut(d) {
 	bar.transition()
 		.delay(170)
 		.attr("x", whiteSpace)
-		.attr("fill", "olive")
-		.attr("width", function(d) { return xScaleAge(d.x1) - xScaleAge(d.x0) - 2 *whiteSpace ; })
-	    .attr("height", function(d) { return svg_height - yScaleAge(d.length); });
+		.attr("fill", "lightblue")
+		.attr("width", function(d) { return xScale(d.x1) - xScale(d.x0) - 2 *whiteSpace ; });
+	    // .attr("height", function(d) { return svg_height - yScale(d.length); });
 
 	toolTip.hide();
 }
