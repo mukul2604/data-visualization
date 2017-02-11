@@ -21,16 +21,20 @@ function dataTypeFunction() {
 
 function dataFunction(id) {
 	//document.getElementById("age").classList.toggle("show");
-	var elements = document.getElementById("datatypes");
+	var elements = document.getElementById("datatypes").children;
 	var i;
-	console.log(elements);
-
+	
 	for (i=0; i < elements.length; i++) {
 		var element = elements[i];
-		console.log(element);
+		if (id == element.id) {
+			var selectElem = document.getElementById(id);
+			d3.select(selectElem).attr("class", "selected");
+		} else {
+			var selectElem = document.getElementById(element.id);
+			d3.select(selectElem).attr("class", "dropdown");
+		}
 	}
-	
-	console.log(id);
+	// console.log(id);
 }
 
 
