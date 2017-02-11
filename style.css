@@ -1,3 +1,59 @@
+.menubar {
+      float:left;
+      margin:20px;
+      display: block;
+}
+
+.dropbtn {
+      background-color: #4CAF50;
+      color: white;
+      padding: 16px;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
+      float: right;
+      margin: 20px;
+}
+
+.dropbtn:hover, .dropbtn:focus {
+      background-color: #3e8e41;
+}
+
+.dropdown {
+      position: relative;
+      display: inline-block;
+}
+
+
+
+.selected {
+      border:1px solid #555;
+      background-color: #A6DAA6;
+      box-shadow: 3px 3px 5px #777 inset;
+}
+
+.dropdown-content {
+      display: none;
+      /*position: relative;*/
+      position: absolute;
+      background-color: #f9f9f9;
+      min-width: 160px;
+      overflow: auto;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      z-index: 1;
+}
+
+.dropdown-content div{
+      color: black;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+}
+
+.dropdown-content div:hover {background-color: #f1f1f1}
+
+.show {display:block;}
+
 .d3-tip {
       line-height: 1;
       padding: 6px;
@@ -20,9 +76,10 @@
       text-align: center;
 }
  
-    /* Style northward tooltips specifically */
+/* Style northward tooltips specifically */
 .d3-tip.n:after {
       margin: -2px 0 0 0;
       top: 100%;
       left: 0;
 }
+
