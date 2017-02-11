@@ -3,7 +3,7 @@ var dataAge = [];
 var dataExper = []
 var canvas;
 var canvasWidth = 850;
-var canvasHeight = 500;
+var canvasHeight = 700;
 var whiteSpace = 2
 var xScaleAge, yScaleAge, 
 	xScaleWage, yScaleWage, 
@@ -135,7 +135,7 @@ function clearCanvas() {
 function initCanvas() {
 	// set the dimensions and margins of the graph
 	// set the ranges
-	svg_margin = {top: 100, right: 30, bottom: 30, left: 50};
+	svg_margin = {top: 200, right: 30, bottom: 30, left: 50};
     svg_width = canvasWidth - svg_margin.left - svg_margin.right;
     svg_height = canvasHeight - svg_margin.top - svg_margin.bottom;
 
@@ -205,9 +205,9 @@ function initCommonHist() {
 }
 
 function initCommonPie() {
-	pieAge = d3.pie().value(function(d) {return d;});
-	pieWage = d3.pie().value(function(d) {return d;});
-	pieExper = d3.pie().value(function(d) {return d;});
+	pieAge = d3.pie().value(function(d) {return d.length;});
+	pieWage = d3.pie().value(function(d) {return d.length;});
+	pieExper = d3.pie().value(function(d) {return d.length;});
 }
 
 function initHistogram () {	
@@ -281,7 +281,8 @@ function handleMouseOverBar(d) {  // Add interactivity
     	.delay(170)
     	.attr("x", -1*whiteSpace)
     	.attr("fill", "orangered")
-       	.attr("width", function(d) { return xScale(d.x1) - xScale(d.x0) + 2*whiteSpace;}); 
+       	.attr("width", function(d) { return xScale(d.x1) - xScale(d.x0) + 2 * whiteSpace;});
+       	//.attr("height", function(d) { return svg_height - yScale(d.length) - 2 * whiteSpace; });
     toolTip.show(d.length);
 }
 
@@ -291,8 +292,8 @@ function handleMouseOutBar(d) {
 		.delay(170)
 		.attr("x", whiteSpace)
 		.attr("fill", "lightblue")
-		.attr("width", function(d) { return xScale(d.x1) - xScale(d.x0) - 2 *whiteSpace ; });
-	    // .attr("height", function(d) { return svg_height - yScale(d.length); });
+		.attr("width", function(d) { return xScale(d.x1) - xScale(d.x0) - 2 * whiteSpace ; });
+	    //.attr("height", function(d) { return svg_height - yScale(d.length); });
 
 	toolTip.hide();
 }
@@ -304,13 +305,13 @@ function initPieChart() {
 	var pie, data;
 	if (attrType == "age") {
 		pie = pieAge;
-		data = dataAge;
+		data = ageBins;
 	} else if (attrType == "wage") {
 		pie = pieWage;
-		data = dataWage;
+		data = wageBins;
 	} else if (attrType == "exper") {
 		pie = pieExper;
-		data = dataExper;
+		data = experBins;
 	}
 	var arc = d3.arc()
         .innerRadius(innerRadius)
@@ -319,13 +320,14 @@ function initPieChart() {
     var arcs = canvas.selectAll("g.arc")
         .data(pie(data))
         .enter()
+        	// .filter(function(d){if (d % 2 == 0) {return d;}})
         	.append("g")
         	.attr("class", "arc")
         	.attr("transform", "translate(" + (outerRadius) + ", " + (outerRadius-50) + ")");
         
     var color = d3.scaleOrdinal()
     			.range(["lightblue", "green", "red", "yellow", "pink", "orangered", "orange", 
-    				    "blue", "green", "brown", "black"]);
+    				    "blue", "green", "brown", "black", "olive"]);
     arcs.append("path");
 
     arcs.select("path")
