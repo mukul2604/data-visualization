@@ -323,22 +323,35 @@ function initPieChart() {
         	// .filter(function(d){if (d % 2 == 0) {return d;}})
         	.append("g")
         	.attr("class", "arc")
-        	.attr("transform", "translate(" + (outerRadius) + ", " + (outerRadius-50) + ")");
+        	.attr("transform", "translate(" + (outerRadius+200) + ", " + (outerRadius-50) + ")");
+        	
         
-    var color = d3.scaleOrdinal()
-    			.range(["lightblue", "green", "red", "yellow", "pink", "orangered", "orange", 
-    				    "blue", "green", "brown", "black", "olive"]);
+    var color = d3.scaleOrdinal(d3.schemeCategory20);
+    			
     arcs.append("path");
 
     arcs.select("path")
         .transition()
-        .delay(function(d, i) {return i;})
+        .delay(function(d, i) {return i*50;})
         .attr("fill", function(d, i) {
             return color(i);
         })
         .attr("d", arc);
+
+    arcs.on("mouseover", handleMouseOverPie)
+        .on("mouseout", handleMouseOutPie);
+}
+
+
+function  handleMouseOverPie() {
+	var d = d3.select(this)
+    console.log(d);
 }
 
 
 
+function handleMouseOutPie() {
+	var d = d3.select(this)
+	console.log(d);
+}
 

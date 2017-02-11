@@ -16,6 +16,11 @@
       align-content: center;
 }
 
+.pie-data {
+    font-family:'verdana';
+    font-size:0.8em;
+    font-weight: bold;
+}
 .dropbtn {
       background-color: #4CAF50;
       color: white;
