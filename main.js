@@ -13,6 +13,26 @@ var ageBins, wageBins, experBins;
 var typeHist = 'age';
 var dataPath ='data/CPS85.csv';
 var toolTip;
+
+
+
+// clean dropdown
+window.onclick = function(event) {
+	//console.log(event);
+  if (!event.target.matches('.dropbtn')) {
+
+    var elements = document.getElementsByClassName("dropdown-content");
+  //  console.log(dropdowns);
+    var i;
+    for (i = 0; i < elements.length; i++) {
+      var element = elements[i];
+      if (element.classList.contains('show')) {
+        element.classList.remove('show');
+      }
+    }
+  }
+}
+
 /* When the user clicks on the button, 
 toggle between hiding and showing the dropdown content */
 function dataTypeFunction() {
@@ -23,12 +43,15 @@ function dataFunction(id) {
 	//document.getElementById("age").classList.toggle("show");
 	var elements = document.getElementById("datatypes").children;
 	var i;
-	
+
 	for (i=0; i < elements.length; i++) {
 		var element = elements[i];
 		if (id == element.id) {
 			var selectElem = document.getElementById(id);
 			d3.select(selectElem).attr("class", "selected");
+			typeHist = id;
+			//console.log(typeHist);
+			initMain();
 		} else {
 			var selectElem = document.getElementById(element.id);
 			d3.select(selectElem).attr("class", "dropdown");
@@ -38,22 +61,8 @@ function dataFunction(id) {
 }
 
 
-window.onclick = function(event) {
-	//console.log(event);
-  if (!event.target.matches('.dropbtn')) {
 
-    var dropdowns = document.getElementsByClassName("dropdown-content");
-  //  console.log(dropdowns);
-    var i;
-    for (i = 0; i < dropdowns.length; i++) {
-      var openDropdown = dropdowns[i];
-      if (openDropdown.classList.contains('show')) {
-        openDropdown.classList.remove('show');
-      }
-    }
-  }
-}
-
+//start of function
 // get the data
 d3.csv(dataPath, function(error, data) {
 	if (error) throw error;
@@ -69,7 +78,18 @@ d3.csv(dataPath, function(error, data) {
 	initMain();
 });
 
-function initMain() {
+function clearCanvas() {
+	d3.selectAll("svg > g *")
+		.attr('opacity', 1)
+		.transition()
+		.duration(100)
+		.attr('opacity', 0)
+		.remove();
+}
+
+function initMain() {	
+	clearCanvas();
+	setTimeout(150);
 	initCanvas();
 	initCommonHist();
 	initHistogram();
