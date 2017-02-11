@@ -129,6 +129,11 @@ function clearCanvas() {
 	canvas.selectAll("*").remove();
 	d3.selectAll("svg")
 		.remove();
+	toolTip.hide();
+	d3.selectAll("#tooltip")
+		.transition()
+		.delay(20)
+        .style("opacity", 0);
 
 }
 
@@ -140,19 +145,33 @@ function initCanvas() {
     svg_height = canvasHeight - svg_margin.top - svg_margin.bottom;
 
 	canvas = d3.select("body").append("svg")
-		    .attr("width", svg_width + svg_margin.left + svg_margin.right)
-		    .attr("height", svg_height + svg_margin.top + svg_margin.bottom)
-		    .attr("float", "none")
-		  	.append("g")
-		    .attr("transform", 
+			.attr("width", svg_width + svg_margin.left + svg_margin.right)
+	    	.attr("height", svg_height + svg_margin.top + svg_margin.bottom)
+	    	.attr("float", "none")
+			.append("g")
+			.attr("transform", 
 		          "translate(" + svg_margin.left + "," + svg_margin.top + ")");
-
+	
 	toolTip = d3.tip()
       			.attr("class", "d3-tip")
       			.offset([-10, 0])
       			.html(function(d) { return "<span style='color:red'>" + d + "</span>" });
     canvas.call(toolTip);
+    //canvas.on("click", handleMouseClick);
+    //canvas.onclick = handleMouseClick;
+    d3.selectAll("svg").on("click", handleMouseClickSvg);
     // d3.select("body").append("div").attr("class", "toolTip");
+}
+
+function handleMouseClickSvg() {
+	if (chartType == "bar") {
+		chartType = "pie"
+	} else if (chartType == "pie") {
+		chartType = "bar";
+	}
+	console.log(chartType);
+	clearCanvas();
+	initMain()
 }
 
 function initCommonHist() {	
@@ -282,7 +301,8 @@ function handleMouseOverBar(d) {  // Add interactivity
     	.attr("x", -1*whiteSpace)
     	.attr("fill", "orangered")
        	.attr("width", function(d) { return xScale(d.x1) - xScale(d.x0) + 2 * whiteSpace;});
-       	//.attr("height", function(d) { return svg_height - yScale(d.length) - 2 * whiteSpace; });
+       	//.attr("transform", "translate(" + (0) + "," + (2*whiteSpace) + ")")
+       	// .attr("height", function(d) { return svg_height - yScale(d.length) + 2 * whiteSpace; });
     toolTip.show(d.length);
 }
 
@@ -347,20 +367,20 @@ function  handleMouseOverPie(d) {
 	//var d = d3.select(this)
 	d3.select("#tooltip")
 		.transition()
-		.delay(200)
+		.delay(100)
         .style("left", d3.event.pageX + "px")
         .style("top", d3.event.pageY + "px")
         .style("opacity", 1)
         .select("#value")
         .text(d.value);
 
-    //console.log(d);
+    console.log(d3.select(this));
 }
 
 
 
 function handleMouseOutPie() {
-	var d = d3.select(this)
+	// var d = d3.select(this)
 	d3.select("#tooltip")
 		.transition()
 		.delay(200)

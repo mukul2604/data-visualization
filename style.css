@@ -19,8 +19,8 @@
 .dropbtn {
       background-color: #4CAF50;
       color: white;
-      padding: 16px;
-      font-size: 16px;
+      padding: 20px;
+      font-size: 10px;
       border: none;
       cursor: pointer;
       /*float: right;*/
@@ -34,6 +34,7 @@
 .dropdown {
       /*position: relative;*/
       display: inline-block;
+      cursor: pointer;
 }
 
 
@@ -42,6 +43,7 @@
       border:1px solid #555;
       background-color: #A6DAA6;
       box-shadow: 3px 3px 5px #777 inset;
+      cursor: pointer;
 }
 
 .dropdown-content {
@@ -49,20 +51,22 @@
       /*position: relative;*/
       position: absolute;
       background-color: #f9f9f9;
-      min-width: 160px;
+      min-width: 80px;
       overflow: auto;
       box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
       z-index: 1;
+      cursor: pointer;
 }
 
 .dropdown-content div{
       color: black;
-      padding: 12px 16px;
+      padding: 8px 16px;
       text-decoration: none;
       display: block;
+      cursor: pointer;
 }
 
-.dropdown-content div:hover {background-color: #f1f1f1}
+.dropdown-content div:hover {background-color: #f1f1f1; cursor: pointer;}
 
 .show {display:block;}
 
