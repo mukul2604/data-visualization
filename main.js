@@ -13,6 +13,42 @@ var ageBins, wageBins, experBins;
 var typeHist = 'age';
 var dataPath ='data/CPS85.csv';
 var toolTip;
+/* When the user clicks on the button, 
+toggle between hiding and showing the dropdown content */
+function dataTypeFunction() {
+    document.getElementById("datatypes").classList.toggle("show");
+}
+
+function dataFunction(id) {
+	//document.getElementById("age").classList.toggle("show");
+	var elements = document.getElementById("datatypes");
+	var i;
+	console.log(elements);
+
+	for (i=0; i < elements.length; i++) {
+		var element = elements[i];
+		console.log(element);
+	}
+	
+	console.log(id);
+}
+
+
+window.onclick = function(event) {
+	//console.log(event);
+  if (!event.target.matches('.dropbtn')) {
+
+    var dropdowns = document.getElementsByClassName("dropdown-content");
+  //  console.log(dropdowns);
+    var i;
+    for (i = 0; i < dropdowns.length; i++) {
+      var openDropdown = dropdowns[i];
+      if (openDropdown.classList.contains('show')) {
+        openDropdown.classList.remove('show');
+      }
+    }
+  }
+}
 
 // get the data
 d3.csv(dataPath, function(error, data) {
