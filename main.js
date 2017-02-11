@@ -2,7 +2,7 @@ var dataWage = [];
 var dataAge = [];
 var dataExper = []
 var canvas;
-var canvasWidth = 960;
+var canvasWidth = 850;
 var canvasHeight = 500;
 var whiteSpace = 2
 var xScaleAge, yScaleAge, 
@@ -299,7 +299,7 @@ function handleMouseOutBar(d) {
 
 //PIE CHART
 function initPieChart() {	
-	var outerRadius = svg_width * 0.3;
+	var outerRadius = svg_width / 3.5;
 	var innerRadius = 0;
 	var pie, data;
 	if (attrType == "age") {

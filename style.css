@@ -1,7 +1,19 @@
+.menu {
+      float:center;
+      margin: 0;
+      position: absolute;
+      top: 10%;
+      left: 50%;
+      -ms-transform: translate(-10%, -50%);
+      transform: translate(-50%, -50%);
+}
+
 .menubar {
       float:left;
-      margin:20px;
+      margin:30px;
       display: block;
+      text-align: center;
+      align-content: center;
 }
 
 .dropbtn {
@@ -11,8 +23,8 @@
       font-size: 16px;
       border: none;
       cursor: pointer;
-      float: right;
-      margin: 20px;
+      /*float: right;*/
+      margin: 0px;
 }
 
 .dropbtn:hover, .dropbtn:focus {
@@ -20,7 +32,7 @@
 }
 
 .dropdown {
-      position: relative;
+      /*position: relative;*/
       display: inline-block;
 }
 
