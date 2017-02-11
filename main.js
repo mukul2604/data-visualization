@@ -1,20 +1,25 @@
 var dataWage = [];
 var dataAge = [];
-var dataExper = []
+var dataExper = [];
+var dataEdu = [];
+var dateMarried = [];
+
 var canvas;
 var canvasWidth = 850;
 var canvasHeight = 700;
 var whiteSpace = 2
 var xScaleAge, yScaleAge, 
 	xScaleWage, yScaleWage, 
-	xScaleExper, yScaleExper;
+	xScaleExper, yScaleExper,
+	xScaleEdu, yScaleEdu,
+	xscaleMarried, yScaleMarried;
 var svg_margin, svg_width, svg_height;
-var ageBins, wageBins, experBins;
+var ageBins, wageBins, experBins, eduBins, marriedBins;
 var attrType = "age";
 var chartType = "bar";
-var dataPath ="data/CPS85.csv";
+var dataPath ="data/data.csv";
 var toolTip;
-var pieAge, pieWage, pieExper;
+var pieAge, pieWage, pieExper, pieEdu;
 
 
 
@@ -56,10 +61,11 @@ function dataFunction(id) {
 	for (i=0; i < elements.length; i++) {
 		var element = elements[i];
 		if (id == element.id) {
-			clearCanvas();
+			
 			var selectElem = document.getElementById(id);
 			d3.select(selectElem).attr("class", "selected");
-			attrType = id;			
+			attrType = id;	
+			clearCanvas();		
 			//console.log(attrType);
 			initMain();
 		} else {
@@ -70,6 +76,7 @@ function dataFunction(id) {
 	// console.log(id);
 }
 
+//function to select the chart
 function chartFunction(id) {
 	clearCanvas();
 	//document.getElementById("age").classList.toggle("show");
@@ -81,7 +88,8 @@ function chartFunction(id) {
 		if (id == element.id) {			
 			var selectElem = document.getElementById(id);
 			d3.select(selectElem).attr("class", "selected");
-			chartType = id;			
+			chartType = id;	
+			clearCanvas();		
 			//console.log(attrType);
 			initMain();
 		} else {
@@ -97,12 +105,17 @@ function chartFunction(id) {
 // get the data
 d3.csv(dataPath, function(error, data) {
 	if (error) throw error;
-
+	
 	data.forEach(function(d) {
 	    dataAge.push(parseInt(d.age));
 	    dataWage.push(parseFloat(d.wage));
 	    dataExper.push(parseInt(d.exper));
+	    dataEdu.push(parseInt(d.educ));
+	    dateMarried.push(d.married);
+	  
 	});
+	// console.log(dataEdu);
+	// console.log(dataAge);
 	// console.log(dataAge);
 	// console.log(dataWage);
 	// console.log(dataExper);
@@ -156,11 +169,11 @@ function initCanvas() {
       			.attr("class", "d3-tip")
       			.offset([-10, 0])
       			.html(function(d) { return "<span style='color:red'>" + d + "</span>" });
+
     canvas.call(toolTip);
-    //canvas.on("click", handleMouseClick);
-    //canvas.onclick = handleMouseClick;
+
     d3.selectAll("svg").on("click", handleMouseClickSvg);
-    // d3.select("body").append("div").attr("class", "toolTip");
+ 
 }
 
 function handleMouseClickSvg() {
@@ -188,12 +201,17 @@ function initCommonHist() {
 					.domain([d3.min(dataWage, function(d) {return d;}) - padding, 
 							padding+d3.max(dataWage, function(d){return d;})])
 					.range([0, svg_width]);
-	//console.log(d3.min(dataExper, function(d) {return d;}));
+	
 	xScaleExper = d3.scaleLinear()
 					.domain([d3.min(dataExper, function(d) {return d;}) - padding,
 							 padding+d3.max(dataExper, function(d){return d;})])
 					.range([0, svg_width]);
 	
+	xScaleEdu	= d3.scaleLinear()
+					.domain([d3.min(dataEdu, function(d){return d;}) - padding, 
+							padding + d3.max(dataEdu, function(d) {return d;})])
+					.range([0, svg_width]);
+
 	ageBins 	= d3.histogram()
 					.domain(xScaleAge.domain())
 					.thresholds(xScaleAge.ticks(ticksHist))
@@ -209,6 +227,11 @@ function initCommonHist() {
 					.thresholds(xScaleExper.ticks(ticksHist))
 					(dataExper);
 
+	eduBins		= d3.histogram()
+					.domain(xScaleEdu.domain())
+					.thresholds(xScaleEdu.ticks(ticksHist))
+					(dataEdu);
+
 	yScaleAge   = d3.scaleLinear()
 			  		.domain([0, d3.max(ageBins, function(d){return d.length;})])			
 	          		.range([svg_height, 0]);
@@ -219,32 +242,40 @@ function initCommonHist() {
 
 	yScaleExper = d3.scaleLinear()
 					.domain([0, d3.max(experBins, function(d){return d.length;})])
-					.range([svg_height,0 ]);	
-
+					.range([svg_height,0 ]);
+	
+	yScaleEdu 	= d3.scaleLinear()
+					.domain([0, d3.max(eduBins, function(d){return d.length;})])
+					.range([svg_height, 0]);
 }
 
 function initCommonPie() {
 	pieAge = d3.pie().value(function(d) {return d.length;});
 	pieWage = d3.pie().value(function(d) {return d.length;});
 	pieExper = d3.pie().value(function(d) {return d.length;});
+	pieEdu = d3.pie().value(function(d) {return d.length;});
 }
 
 function initHistogram () {	
 	var xScale, yScale, bins;
 	
 
-	if (attrType == 'age') {
+	if (attrType == "age") {
 		xScale = xScaleAge;
 		yScale = yScaleAge;
 		bins =  ageBins;
-	} else if (attrType == 'wage') {
+	} else if (attrType == "wage") {
 		xScale = xScaleWage;
 		yScale = yScaleWage;
 		bins =  wageBins;
-	} else if (attrType == 'exper') {
+	} else if (attrType == "exper") {
 		xScale = xScaleExper;
 		yScale = yScaleExper;
 		bins =  experBins;
+	} else if (attrType == "educ") {
+		xScale = xScaleEdu;
+		yScale = yScaleEdu;
+		bins = eduBins;
 	}
 
   	var grpHist = canvas.selectAll(".bar")
@@ -285,24 +316,27 @@ function handleMouseOverBar(d) {  // Add interactivity
 	
     var bar = d3.select(this);
 
-	if (attrType == 'age') {
+	if (attrType == "age") {
 		xScale = xScaleAge;
 		yScale = yScaleAge;
-	} else if (attrType == 'wage') {
+	} else if (attrType == "wage") {
 		xScale = xScaleWage;
 		yScale = yScaleWage;
-	} else if (attrType == 'exper') {
+	} else if (attrType == "exper") {
 		xScale = xScaleExper;
 		yScale = yScaleExper;
+	} else if (attrType == "educ") {
+		xScale = xScaleEdu;
+		yScale = yScaleEdu;
 	}
 
     bar.transition()
     	.delay(170)
     	.attr("x", -1*whiteSpace)
     	.attr("fill", "orangered")
-       	.attr("width", function(d) { return xScale(d.x1) - xScale(d.x0) + 2 * whiteSpace;});
-       	//.attr("transform", "translate(" + (0) + "," + (2*whiteSpace) + ")")
-       	// .attr("height", function(d) { return svg_height - yScale(d.length) + 2 * whiteSpace; });
+       	.attr("width", function(d) { return xScale(d.x1) - xScale(d.x0) + 2 * whiteSpace;})
+       	.attr("height", function(d) { return svg_height - yScale(d.length) + 5 * whiteSpace; })
+       	.attr("transform", "translate(" + xScale(d.x0) + "," +  (yScale(d.length) - 5 * whiteSpace) + ")");
     toolTip.show(d.length);
 }
 
@@ -312,8 +346,9 @@ function handleMouseOutBar(d) {
 		.delay(170)
 		.attr("x", whiteSpace)
 		.attr("fill", "lightblue")
-		.attr("width", function(d) { return xScale(d.x1) - xScale(d.x0) - 2 * whiteSpace ; });
-	    //.attr("height", function(d) { return svg_height - yScale(d.length); });
+		.attr("width", function(d) { return xScale(d.x1) - xScale(d.x0) - 2 * whiteSpace ; })	
+		.attr("height", function(d) {return svg_height - yScale(d.length) - 5 *whiteSpace;})    
+	    .attr("transform", "translate(" + xScale(d.x0) + "," +  (yScale(d.length) + 5 * whiteSpace) + ")");    
 
 	toolTip.hide();
 }
@@ -332,7 +367,11 @@ function initPieChart() {
 	} else if (attrType == "exper") {
 		pie = pieExper;
 		data = experBins;
+	} else if (attrType == "educ") {
+		pie = pieEdu;
+		data = eduBins;
 	}
+
 	var arc = d3.arc()
         .innerRadius(innerRadius)
         .outerRadius(outerRadius);
