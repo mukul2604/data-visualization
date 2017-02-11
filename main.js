@@ -149,7 +149,7 @@ function initCanvas() {
 
 	toolTip = d3.tip()
       			.attr("class", "d3-tip")
-      			.offset([-8, 0])
+      			.offset([-10, 0])
       			.html(function(d) { return "<span style='color:red'>" + d + "</span>" });
     canvas.call(toolTip);
     // d3.select("body").append("div").attr("class", "toolTip");
@@ -343,15 +343,27 @@ function initPieChart() {
 }
 
 
-function  handleMouseOverPie() {
-	var d = d3.select(this)
-    console.log(d);
+function  handleMouseOverPie(d) {
+	//var d = d3.select(this)
+	d3.select("#tooltip")
+		.transition()
+		.delay(200)
+        .style("left", d3.event.pageX + "px")
+        .style("top", d3.event.pageY + "px")
+        .style("opacity", 1)
+        .select("#value")
+        .text(d.value);
+
+    //console.log(d);
 }
 
 
 
 function handleMouseOutPie() {
 	var d = d3.select(this)
-	console.log(d);
+	d3.select("#tooltip")
+		.transition()
+		.delay(200)
+        .style("opacity", 0);;
 }
 
