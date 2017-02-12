@@ -417,7 +417,6 @@ function  handleMouseOverPie(d) {
 }
 
 
-
 function handleMouseOutPie() {
 	// var d = d3.select(this)
 	d3.select("#tooltip")
