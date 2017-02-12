@@ -20,18 +20,15 @@ var chartType = "bar";
 var dataPath ="data/data.csv";
 var toolTip;
 var pieAge, pieWage, pieExper, pieEdu;
-
+var ticksHist = 20;
+var dragStartX, dragCurrentX;
 
 
 
 //Menu stuff
-// clean dropdown
 window.onclick = function(event) {
-	//console.log(event);
   if (!event.target.matches(".dropbtn")) {
-
     var elements = document.getElementsByClassName("dropdown-content");
-  //  console.log(dropdowns);
     var i;
     for (i = 0; i < elements.length; i++) {
       var element = elements[i];
@@ -42,7 +39,8 @@ window.onclick = function(event) {
   }
 }
 
-/* When the user clicks on the button,
+/* When the user clicks
+ on the button,
 toggle between hiding and showing the dropdown content */
 function attrTypeFunction() {
     document.getElementById("attrtypes").classList.toggle("show");
@@ -167,11 +165,47 @@ function initCanvas() {
       			.html(function(d) { return "<span style='color:red'>" + d + "</span>" });
 
     canvas.call(toolTip);
-    canvas.on("onmousemove", function() {console.log(this);});
-    // canvas.on("mousemove" , mouseMoveMethod);
     d3.selectAll("svg").on("click", handleMouseClickSvg);
+    d3.selectAll("svg").call(d3.drag()
+                .on("start", dragStarted)
+                .on("drag", draggedSpan));
+                //.on("end", dragEnded));
+
 
 }
+
+function dragStarted() {
+    //console.log("start" + d3.event.x);
+    if (chartType != "bar") {
+        return;
+    }
+    dragStartX = d3.event.x;
+//    console.log(d3.event.y);
+}
+
+function draggedSpan() {
+    //console.log("span" + d3.event.x);
+    if (chartType != "bar") {
+        return;
+    }
+
+    dragCurrentX = d3.event.x;
+    if (Math.abs(dragCurrentX - dragStartX) > 20) {
+        if (dragCurrentX > dragStartX) {
+            ticksHist += 5;
+        } else {
+            ticksHist -= 5;
+        }
+        dragStartX = dragCurrentX;
+    }
+    console.log(ticksHist);
+    clearCanvas();
+    initMain();
+}
+//
+//function dragEnded() {
+//    console.log("ended" + d3.event.x);
+//}
 
 function handleMouseClickSvg() {
 	if (chartType == "bar") {
@@ -187,7 +221,7 @@ function handleMouseClickSvg() {
 
 function initCommonHist() {
 	var padding = 2;
-	var ticksHist = 20;
+
 
 	xScaleAge   = d3.scaleLinear()
 	          		.domain([d3.min(dataAge, function(d){return d;}) - padding,
@@ -279,17 +313,21 @@ function initHistogram () {
       				.data(bins)
     				.enter();
 
-    grpHist.append("rect")
+    var rectBars = grpHist.append("rect")
+            .on("mouseover", handleMouseOverBar)
+	    	.on("mouseout", handleMouseOutBar)
     		.attr("fill", "lightblue")
 	    	.attr("x", whiteSpace)
 	    	.attr("transform", function(d) {
 				return "translate(" + xScale(d.x0) + "," + yScale(d.length) + ")"; })
+			.transition()
+			.delay(function(d,i) {return i* d.length;})
 	    	.attr("width", function(d) {
 	    		return xScale(d.x1) - xScale(d.x0) - 2 * whiteSpace; })
 	    	.attr("height", function(d) {
-	    		return svg_height - yScale(d.length); })
-	    	.on("mouseover", handleMouseOverBar)
-	    	.on("mouseout", handleMouseOutBar);
+	    		return svg_height - yScale(d.length);});
+
+	    	//;
 
 	canvas.append("g")
       .attr("transform", "translate(0," + svg_height + ")")
