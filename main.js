@@ -23,6 +23,7 @@ var pieAge, pieWage, pieExper, pieEdu;
 
 
 
+
 //Menu stuff
 // clean dropdown
 window.onclick = function(event) {
@@ -166,7 +167,8 @@ function initCanvas() {
       			.html(function(d) { return "<span style='color:red'>" + d + "</span>" });
 
     canvas.call(toolTip);
-
+    canvas.on("onmousemove", function() {console.log(this);});
+    // canvas.on("mousemove" , mouseMoveMethod);
     d3.selectAll("svg").on("click", handleMouseClickSvg);
 
 }
@@ -182,10 +184,10 @@ function handleMouseClickSvg() {
 	initMain()
 }
 
-function initCommonHist() {
 
+function initCommonHist() {
 	var padding = 2;
-	var ticksHist = 25;
+	var ticksHist = 20;
 
 	xScaleAge   = d3.scaleLinear()
 	          		.domain([d3.min(dataAge, function(d){return d;}) - padding,
@@ -348,10 +350,12 @@ function handleMouseOutBar(d) {
 	toolTip.hide();
 }
 
+var pieBins;
 //PIE CHART
 function initPieChart() {
 	var outerRadius = svg_width / 3.5;
-	var innerRadius = 0;
+	var innerRadius = outerRadius/2;	
+	
 	var pie, data;
 	if (attrType == "age") {
 		pie = pieAge;
@@ -367,6 +371,8 @@ function initPieChart() {
 		data = eduBins;
 	}
 
+	pieBins = data;
+
 	var arc = d3.arc()
         .innerRadius(innerRadius)
         .outerRadius(outerRadius);
@@ -377,7 +383,7 @@ function initPieChart() {
         	// .filter(function(d){if (d % 2 == 0) {return d;}})
         	.append("g")
         	.attr("class", "arc")
-        	.attr("transform", "translate(" + (outerRadius+200) + ", " + (outerRadius-50) + ")");
+        	.attr("transform", "translate(" + svg_width/2 + ", " + svg_height/2 + ")");
 
 
     var color = d3.scaleOrdinal(d3.schemeCategory20);
@@ -394,11 +400,14 @@ function initPieChart() {
 
     arcs.on("mouseover", handleMouseOverPie)
         .on("mouseout", handleMouseOutPie);
+
+    
 }
 
 
-function  handleMouseOverPie(d) {
-	//var d = d3.select(this)
+function  handleMouseOverPie(d,i) {
+	var start, end;
+
 	d3.select("#tooltip")
 		.transition()
 		.delay(100)
@@ -408,15 +417,31 @@ function  handleMouseOverPie(d) {
         .select("#value")
         .text(d.value);
 
-    console.log(d3.select(this));
+    canvas.append('text')
+    		.attr('class', 'pietext')
+            .attr("transform", function(d) {
+                return "translate(" + svg_width/2 + "," + svg_height/2 + ")";
+            })
+            .attr("text-anchor", "middle")
+            .text(function() {
+                return '[' + pieBins[i].x0 + "-" + pieBins[i].x1 + '] : ' + d.value + ' elements';
+            })
+            .style("opacity", 0)
+            .transition()
+            .delay(100)
+            .style("opacity", 1);
 }
 
 
 function handleMouseOutPie() {
-	// var d = d3.select(this)
 	d3.select("#tooltip")
 		.transition()
 		.delay(200)
-        .style("opacity", 0);;
+        .style("opacity", 0);
+
+    canvas.selectAll("text")
+    		.transition()
+    		.delay(100)
+    		.style("opacity", "0");
 }
 

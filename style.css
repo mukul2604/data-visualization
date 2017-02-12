@@ -99,6 +99,15 @@
       left: 0;
 }
 
+.pietext {
+  font-family: sans-serif;
+  color: red;
+  font-weight: bold;
+/*  color:*/ 
+  /*opacity: 0;*/
+  /*text-anchor: middle;*/
+}
+
 #tooltip {
     position: absolute;
     width: 20px;
