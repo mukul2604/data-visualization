@@ -8,8 +8,8 @@ var canvas;
 var canvasWidth = 850;
 var canvasHeight = 700;
 var whiteSpace = 2
-var xScaleAge, yScaleAge, 
-	xScaleWage, yScaleWage, 
+var xScaleAge, yScaleAge,
+	xScaleWage, yScaleWage,
 	xScaleExper, yScaleExper,
 	xScaleEdu, yScaleEdu,
 	xscaleMarried, yScaleMarried;
@@ -41,7 +41,7 @@ window.onclick = function(event) {
   }
 }
 
-/* When the user clicks on the button, 
+/* When the user clicks on the button,
 toggle between hiding and showing the dropdown content */
 function attrTypeFunction() {
     document.getElementById("attrtypes").classList.toggle("show");
@@ -61,11 +61,11 @@ function dataFunction(id) {
 	for (i=0; i < elements.length; i++) {
 		var element = elements[i];
 		if (id == element.id) {
-			
+
 			var selectElem = document.getElementById(id);
 			d3.select(selectElem).attr("class", "selected");
-			attrType = id;	
-			clearCanvas();		
+			attrType = id;
+			clearCanvas();
 			//console.log(attrType);
 			initMain();
 		} else {
@@ -85,11 +85,11 @@ function chartFunction(id) {
 
 	for (i=0; i < elements.length; i++) {
 		var element = elements[i];
-		if (id == element.id) {			
+		if (id == element.id) {
 			var selectElem = document.getElementById(id);
 			d3.select(selectElem).attr("class", "selected");
-			chartType = id;	
-			clearCanvas();		
+			chartType = id;
+			clearCanvas();
 			//console.log(attrType);
 			initMain();
 		} else {
@@ -105,28 +105,23 @@ function chartFunction(id) {
 // get the data
 d3.csv(dataPath, function(error, data) {
 	if (error) throw error;
-	
+
 	data.forEach(function(d) {
 	    dataAge.push(parseInt(d.age));
 	    dataWage.push(parseFloat(d.wage));
 	    dataExper.push(parseInt(d.exper));
 	    dataEdu.push(parseInt(d.educ));
 	    dateMarried.push(d.married);
-	  
+
 	});
-	// console.log(dataEdu);
-	// console.log(dataAge);
-	// console.log(dataAge);
-	// console.log(dataWage);
-	// console.log(dataExper);
 	initMain();
 });
 
 
-function initMain() {		
-	
+function initMain() {
+
 	initCanvas();
-	initCommonHist();	
+	initCommonHist();
 	initCommonPie();
 
 	if (chartType == "bar") {
@@ -162,9 +157,9 @@ function initCanvas() {
 	    	.attr("height", svg_height + svg_margin.top + svg_margin.bottom)
 	    	.attr("float", "none")
 			.append("g")
-			.attr("transform", 
+			.attr("transform",
 		          "translate(" + svg_margin.left + "," + svg_margin.top + ")");
-	
+
 	toolTip = d3.tip()
       			.attr("class", "d3-tip")
       			.offset([-20, 0])
@@ -173,7 +168,7 @@ function initCanvas() {
     canvas.call(toolTip);
 
     d3.selectAll("svg").on("click", handleMouseClickSvg);
- 
+
 }
 
 function handleMouseClickSvg() {
@@ -187,28 +182,28 @@ function handleMouseClickSvg() {
 	initMain()
 }
 
-function initCommonHist() {	
+function initCommonHist() {
 
 	var padding = 2;
 	var ticksHist = 25;
 
 	xScaleAge   = d3.scaleLinear()
-	          		.domain([d3.min(dataAge, function(d){return d;}) - padding, 
+	          		.domain([d3.min(dataAge, function(d){return d;}) - padding,
 	          			padding+d3.max(dataAge, function(d){return d;})])
 	          		.range([0, svg_width]);
 
 	xScaleWage  = d3.scaleLinear()
-					.domain([d3.min(dataWage, function(d) {return d;}) - padding, 
+					.domain([d3.min(dataWage, function(d) {return d;}) - padding,
 							padding+d3.max(dataWage, function(d){return d;})])
 					.range([0, svg_width]);
-	
+
 	xScaleExper = d3.scaleLinear()
 					.domain([d3.min(dataExper, function(d) {return d;}) - padding,
 							 padding+d3.max(dataExper, function(d){return d;})])
 					.range([0, svg_width]);
-	
+
 	xScaleEdu	= d3.scaleLinear()
-					.domain([d3.min(dataEdu, function(d){return d;}) - padding, 
+					.domain([d3.min(dataEdu, function(d){return d;}) - padding,
 							padding + d3.max(dataEdu, function(d) {return d;})])
 					.range([0, svg_width]);
 
@@ -233,7 +228,7 @@ function initCommonHist() {
 					(dataEdu);
 
 	yScaleAge   = d3.scaleLinear()
-			  		.domain([0, d3.max(ageBins, function(d){return d.length;})])			
+			  		.domain([0, d3.max(ageBins, function(d){return d.length;})])
 	          		.range([svg_height, 0]);
 
 	yScaleWage  = d3.scaleLinear()
@@ -243,7 +238,7 @@ function initCommonHist() {
 	yScaleExper = d3.scaleLinear()
 					.domain([0, d3.max(experBins, function(d){return d.length;})])
 					.range([svg_height,0 ]);
-	
+
 	yScaleEdu 	= d3.scaleLinear()
 					.domain([0, d3.max(eduBins, function(d){return d.length;})])
 					.range([svg_height, 0]);
@@ -256,9 +251,9 @@ function initCommonPie() {
 	pieEdu = d3.pie().value(function(d) {return d.length;});
 }
 
-function initHistogram () {	
+function initHistogram () {
 	var xScale, yScale, bins;
-	
+
 
 	if (attrType == "age") {
 		xScale = xScaleAge;
@@ -280,16 +275,16 @@ function initHistogram () {
 
   	var grpHist = canvas.selectAll(".bar")
       				.data(bins)
-    				.enter();  						
+    				.enter();
 
     grpHist.append("rect")
     		.attr("fill", "lightblue")
 	    	.attr("x", whiteSpace)
 	    	.attr("transform", function(d) {
 				return "translate(" + xScale(d.x0) + "," + yScale(d.length) + ")"; })
-	    	.attr("width", function(d) { 
+	    	.attr("width", function(d) {
 	    		return xScale(d.x1) - xScale(d.x0) - 2 * whiteSpace; })
-	    	.attr("height", function(d) { 
+	    	.attr("height", function(d) {
 	    		return svg_height - yScale(d.length); })
 	    	.on("mouseover", handleMouseOverBar)
 	    	.on("mouseout", handleMouseOutBar);
@@ -298,22 +293,22 @@ function initHistogram () {
       .attr("transform", "translate(0," + svg_height + ")")
       .call(d3.axisBottom(xScale));
 
-    canvas.append("g").append("text")             
+    canvas.append("g").append("text")
       .attr("transform",
-            "translate(" + (svg_width/2) + " ," + 
+            "translate(" + (svg_width/2) + " ," +
                            (svg_height + svg_margin.top + 20) + ")")
       .style("text-anchor", "middle")
       .text("Age in years");
 
   	// add the y Axis
 	canvas.append("g")
-      .call(d3.axisLeft(yScale));     
+      .call(d3.axisLeft(yScale));
 
 }
 
 
 function handleMouseOverBar(d) {  // Add interactivity
-	
+
     var bar = d3.select(this);
 
 	if (attrType == "age") {
@@ -346,15 +341,15 @@ function handleMouseOutBar(d) {
 		.delay(170)
 		.attr("x", whiteSpace)
 		.attr("fill", "lightblue")
-		.attr("width", function(d) { return xScale(d.x1) - xScale(d.x0) - 2 * whiteSpace ; })	
-		.attr("height", function(d) {return svg_height - yScale(d.length);})    
-	    .attr("transform", "translate(" + xScale(d.x0) + "," +  yScale(d.length) + ")");    
+		.attr("width", function(d) { return xScale(d.x1) - xScale(d.x0) - 2 * whiteSpace ; })
+		.attr("height", function(d) {return svg_height - yScale(d.length);})
+	    .attr("transform", "translate(" + xScale(d.x0) + "," +  yScale(d.length) + ")");
 
 	toolTip.hide();
 }
 
 //PIE CHART
-function initPieChart() {	
+function initPieChart() {
 	var outerRadius = svg_width / 3.5;
 	var innerRadius = 0;
 	var pie, data;
@@ -375,7 +370,7 @@ function initPieChart() {
 	var arc = d3.arc()
         .innerRadius(innerRadius)
         .outerRadius(outerRadius);
-    
+
     var arcs = canvas.selectAll("g.arc")
         .data(pie(data))
         .enter()
@@ -383,10 +378,10 @@ function initPieChart() {
         	.append("g")
         	.attr("class", "arc")
         	.attr("transform", "translate(" + (outerRadius+200) + ", " + (outerRadius-50) + ")");
-        	
-        
+
+
     var color = d3.scaleOrdinal(d3.schemeCategory20);
-    			
+
     arcs.append("path");
 
     arcs.select("path")
