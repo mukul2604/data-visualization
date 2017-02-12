@@ -22,8 +22,9 @@ var toolTip;
 var pieAge, pieWage, pieExper, pieEdu;
 var ticksHist = 20;
 var dragStartX, dragCurrentX;
-
-
+var maxTicks;
+var pixelsDragged = 20;
+var pieBins;
 
 //Menu stuff
 window.onclick = function(event) {
@@ -39,9 +40,6 @@ window.onclick = function(event) {
   }
 }
 
-/* When the user clicks
- on the button,
-toggle between hiding and showing the dropdown content */
 function attrTypeFunction() {
     document.getElementById("attrtypes").classList.toggle("show");
 }
@@ -53,7 +51,6 @@ function chartTypeFunction() {
 
 function dataFunction(id) {
 	clearCanvas();
-	//document.getElementById("age").classList.toggle("show");
 	var elements = document.getElementById("attrtypes").children;
 	var i;
 
@@ -65,20 +62,17 @@ function dataFunction(id) {
 			d3.select(selectElem).attr("class", "selected");
 			attrType = id;
 			clearCanvas();
-			//console.log(attrType);
 			initMain();
 		} else {
 			var selectElem = document.getElementById(element.id);
 			d3.select(selectElem).attr("class", "dropdown");
 		}
 	}
-	// console.log(id);
 }
 
 //function to select the chart
 function chartFunction(id) {
 	clearCanvas();
-	//document.getElementById("age").classList.toggle("show");
 	var elements = document.getElementById("charttypes").children;
 	var i;
 
@@ -89,19 +83,16 @@ function chartFunction(id) {
 			d3.select(selectElem).attr("class", "selected");
 			chartType = id;
 			clearCanvas();
-			//console.log(attrType);
 			initMain();
 		} else {
 			var selectElem = document.getElementById(element.id);
 			d3.select(selectElem).attr("class", "dropdown");
 		}
 	}
-	// console.log(id);
 }
 
 
-//start of function
-// get the data
+
 d3.csv(dataPath, function(error, data) {
 	if (error) throw error;
 
@@ -131,7 +122,6 @@ function initMain() {
 }
 
 
-
 function clearCanvas() {
 	canvas.selectAll("*").remove();
 	d3.selectAll("svg")
@@ -145,11 +135,10 @@ function clearCanvas() {
 }
 
 function initCanvas() {
-	// set the dimensions and margins of the graph
-	// set the ranges
 	svg_margin = {top: 200, right: 30, bottom: 30, left: 50};
     svg_width = canvasWidth - svg_margin.left - svg_margin.right;
     svg_height = canvasHeight - svg_margin.top - svg_margin.bottom;
+    maxTicks = 100;
 
 	canvas = d3.select("body").append("svg")
 			.attr("width", svg_width + svg_margin.left + svg_margin.right)
@@ -169,43 +158,37 @@ function initCanvas() {
     d3.selectAll("svg").call(d3.drag()
                 .on("start", dragStarted)
                 .on("drag", draggedSpan));
-                //.on("end", dragEnded));
-
-
 }
 
 function dragStarted() {
-    //console.log("start" + d3.event.x);
     if (chartType != "bar") {
         return;
     }
     dragStartX = d3.event.x;
-//    console.log(d3.event.y);
 }
 
 function draggedSpan() {
-    //console.log("span" + d3.event.x);
     if (chartType != "bar") {
         return;
     }
 
     dragCurrentX = d3.event.x;
-    if (Math.abs(dragCurrentX - dragStartX) > 20) {
+    if (Math.abs(dragCurrentX - dragStartX) > pixelsDragged) {
         if (dragCurrentX > dragStartX) {
             ticksHist += 5;
+            if (ticksHist > maxTicks) {
+                ticksHist = maxTicks;
+                return;
+            }
         } else {
             ticksHist -= 5;
         }
         dragStartX = dragCurrentX;
     }
-    console.log(ticksHist);
     clearCanvas();
     initMain();
 }
-//
-//function dragEnded() {
-//    console.log("ended" + d3.event.x);
-//}
+
 
 function handleMouseClickSvg() {
 	if (chartType == "bar") {
@@ -213,7 +196,6 @@ function handleMouseClickSvg() {
 	} else if (chartType == "pie") {
 		chartType = "bar";
 	}
-	console.log(chartType);
 	clearCanvas();
 	initMain()
 }
@@ -290,7 +272,6 @@ function initCommonPie() {
 function initHistogram () {
 	var xScale, yScale, bins;
 
-
 	if (attrType == "age") {
 		xScale = xScaleAge;
 		yScale = yScaleAge;
@@ -313,7 +294,7 @@ function initHistogram () {
       				.data(bins)
     				.enter();
 
-    var rectBars = grpHist.append("rect")
+    grpHist.append("rect")
             .on("mouseover", handleMouseOverBar)
 	    	.on("mouseout", handleMouseOutBar)
     		.attr("fill", "lightblue")
@@ -327,8 +308,6 @@ function initHistogram () {
 	    	.attr("height", function(d) {
 	    		return svg_height - yScale(d.length);});
 
-	    	//;
-
 	canvas.append("g")
       .attr("transform", "translate(0," + svg_height + ")")
       .call(d3.axisBottom(xScale));
@@ -340,15 +319,13 @@ function initHistogram () {
       .style("text-anchor", "middle")
       .text("Age in years");
 
-  	// add the y Axis
-	canvas.append("g")
+  	canvas.append("g")
       .call(d3.axisLeft(yScale));
 
 }
 
 
-function handleMouseOverBar(d) {  // Add interactivity
-
+function handleMouseOverBar(d) {
     var bar = d3.select(this);
 
 	if (attrType == "age") {
@@ -388,7 +365,7 @@ function handleMouseOutBar(d) {
 	toolTip.hide();
 }
 
-var pieBins;
+
 //PIE CHART
 function initPieChart() {
 	var outerRadius = svg_width / 3.5;
