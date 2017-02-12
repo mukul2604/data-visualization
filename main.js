@@ -167,7 +167,7 @@ function initCanvas() {
 	
 	toolTip = d3.tip()
       			.attr("class", "d3-tip")
-      			.offset([-10, 0])
+      			.offset([-20, 0])
       			.html(function(d) { return "<span style='color:red'>" + d + "</span>" });
 
     canvas.call(toolTip);
@@ -335,8 +335,8 @@ function handleMouseOverBar(d) {  // Add interactivity
     	.attr("x", -1*whiteSpace)
     	.attr("fill", "orangered")
        	.attr("width", function(d) { return xScale(d.x1) - xScale(d.x0) + 2 * whiteSpace;})
-       	.attr("height", function(d) { return svg_height - yScale(d.length) + 5 * whiteSpace; })
-       	.attr("transform", "translate(" + xScale(d.x0) + "," +  (yScale(d.length) - 5 * whiteSpace) + ")");
+       	.attr("height", function(d) { return svg_height - yScale(d.length) + 8 * whiteSpace; })
+       	.attr("transform", "translate(" + xScale(d.x0) + "," +  (yScale(d.length) - 8 * whiteSpace) + ")");
     toolTip.show(d.length);
 }
 
@@ -347,8 +347,8 @@ function handleMouseOutBar(d) {
 		.attr("x", whiteSpace)
 		.attr("fill", "lightblue")
 		.attr("width", function(d) { return xScale(d.x1) - xScale(d.x0) - 2 * whiteSpace ; })	
-		.attr("height", function(d) {return svg_height - yScale(d.length) - 5 *whiteSpace;})    
-	    .attr("transform", "translate(" + xScale(d.x0) + "," +  (yScale(d.length) + 5 * whiteSpace) + ")");    
+		.attr("height", function(d) {return svg_height - yScale(d.length);})    
+	    .attr("transform", "translate(" + xScale(d.x0) + "," +  yScale(d.length) + ")");    
 
 	toolTip.hide();
 }
