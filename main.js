@@ -325,24 +325,24 @@ function initCommonPie() {
 }
 
 function initBarChart() {
-    var g = canvas.append("g");
+    var barGrp = canvas.append("g");
 
-    g.append("g")
-      .attr("class", "axis axis--x")
-      .attr("transform", "translate(0," + svg_height + ")")
-      .call(d3.axisBottom(xScaleMarried));
+    barGrp.append("g")
+            .attr("class", "axis axis--x")
+            .attr("transform", "translate(0," + svg_height + ")")
+            .call(d3.axisBottom(xScaleMarried));
 
-    g.append("g")
-      .attr("class", "axis axis--y")
-      .call(d3.axisLeft(yScaleMarried).ticks(10))
-      .append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 6)
-      .attr("dy", "0.71em")
-      .attr("text-anchor", "end")
-      .text("Frequency");
+    barGrp.append("g")
+            .attr("class", "axis axis--y")
+            .call(d3.axisLeft(yScaleMarried).ticks(10))
+            .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 6)
+            .attr("dy", "0.71em")
+            .attr("text-anchor", "end")
+            .text("Frequency");
 
-    g.selectAll("rect")
+    barGrp.selectAll("rect")
         .data(dataMarried)
         .enter().append("rect")
         .attr("class", "bar")
