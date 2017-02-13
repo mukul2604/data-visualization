@@ -302,7 +302,7 @@ function initHistogram () {
 	    	.attr("transform", function(d) {
 				return "translate(" + xScale(d.x0) + "," + yScale(d.length) + ")"; })
 			.transition()
-			.delay(function(d,i) {return i* d.length;})
+			.delay(function(d,i) {return Math.min(i, 50) * Math.min(d.length, 10);})
 	    	.attr("width", function(d) {
 	    		return xScale(d.x1) - xScale(d.x0) - 2 * whiteSpace; })
 	    	.attr("height", function(d) {
@@ -395,8 +395,7 @@ function initPieChart() {
     var arcs = canvas.selectAll("g.arc")
         .data(pie(data))
         .enter()
-        	// .filter(function(d){if (d % 2 == 0) {return d;}})
-        	.append("g")
+           	.append("g")
         	.attr("class", "arc")
         	.attr("transform", "translate(" + svg_width/2 + ", " + svg_height/2 + ")");
 
