@@ -57,7 +57,6 @@ function dataFunction(id) {
 	for (i=0; i < elements.length; i++) {
 		var element = elements[i];
 		if (id == element.id) {
-
 			var selectElem = document.getElementById(id);
 			d3.select(selectElem).attr("class", "selected");
 			attrType = id;
@@ -213,10 +212,20 @@ function draggedSpan() {
 
 
 function handleMouseClickSvg() {
+    var selectElem;
 	if (chartType == "bar") {
 		chartType = "pie"
+		selectElem = document.getElementById("pie");
+		d3.select(selectElem).attr("class", "selected");
+		selectElem = document.getElementById("bar");
+		d3.select(selectElem).attr("class", "dropdown");
+
 	} else if (chartType == "pie") {
 		chartType = "bar";
+		selectElem = document.getElementById("bar");
+		d3.select(selectElem).attr("class", "selected");
+		selectElem = document.getElementById("pie");
+		d3.select(selectElem).attr("class", "dropdown");
 	}
 	clearCanvas();
 	initMain()
