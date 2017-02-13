@@ -2,7 +2,7 @@ var dataWage = [];
 var dataAge = [];
 var dataExper = [];
 var dataEdu = [];
-var dateMarried = [];
+var dataMarried = [];
 
 var canvas;
 var canvasWidth = 850;
@@ -12,14 +12,14 @@ var xScaleAge, yScaleAge,
 	xScaleWage, yScaleWage,
 	xScaleExper, yScaleExper,
 	xScaleEdu, yScaleEdu,
-	xscaleMarried, yScaleMarried;
+	xScaleMarried, yScaleMarried;
 var svg_margin, svg_width, svg_height;
-var ageBins, wageBins, experBins, eduBins, marriedBins;
+var ageBins, wageBins, experBins, eduBins;
 var attrType = "age";
 var chartType = "bar";
 var dataPath ="data/data.csv";
 var toolTip;
-var pieAge, pieWage, pieExper, pieEdu;
+var pieAge, pieWage, pieExper, pieEdu, pieMarried;
 var ticksHist = 20;
 var dragStartX, dragCurrentX;
 var maxTicks;
@@ -95,15 +95,31 @@ function chartFunction(id) {
 
 d3.csv(dataPath, function(error, data) {
 	if (error) throw error;
-
+    var temp = [];
 	data.forEach(function(d) {
 	    dataAge.push(parseInt(d.age));
 	    dataWage.push(parseFloat(d.wage));
 	    dataExper.push(parseInt(d.exper));
 	    dataEdu.push(parseInt(d.educ));
-	    dateMarried.push(d.married);
+	    temp.push(d.married);
 
 	});
+
+    dataMarried.push({"name":"Single", "value":0});
+    dataMarried.push({"name":"Married", "value":0});
+    dataMarried.push({"name":"Divorced", "value":0});
+    dataMarried.push({"name":"Separated", "value":0});
+    dataMarried.push({"name":"Widowed", "value":0});
+
+    var j;
+    for (let i of  temp ){
+        for (j = 0; j < dataMarried.length; j++) {
+            if (dataMarried[j].name == i) {
+                dataMarried[j].value += 1;
+            }
+        }
+    }
+
 	initMain();
 });
 
@@ -115,10 +131,15 @@ function initMain() {
 	initCommonPie();
 
 	if (chartType == "bar") {
-		initHistogram();
+	    if (attrType == "married") {
+	        initBarChart();
+	    } else {
+	        initHistogram();
+		}
 	} else if (chartType == "pie") {
 		initPieChart();
 	}
+    //initBarChart();
 }
 
 
@@ -155,6 +176,7 @@ function initCanvas() {
 
     canvas.call(toolTip);
     d3.selectAll("svg").on("click", handleMouseClickSvg);
+
     d3.selectAll("svg").call(d3.drag()
                 .on("start", dragStarted)
                 .on("drag", draggedSpan));
@@ -203,6 +225,7 @@ function handleMouseClickSvg() {
 
 function initCommonHist() {
 	var padding = 2;
+	var i = 0;
 
 
 	xScaleAge   = d3.scaleLinear()
@@ -225,6 +248,20 @@ function initCommonHist() {
 							padding + d3.max(dataEdu, function(d) {return d;})])
 					.range([0, svg_width]);
 
+    var xNames = [];
+    var yValues = [];
+
+    for (i = 0; i < dataMarried.length; i++) {
+        xNames.push(dataMarried[i].name);
+        yValues.push(dataMarried[i].value);
+    }
+
+    xScaleMarried = d3.scaleBand()
+                        .rangeRound([0, svg_width]).padding(0.1)
+                        .domain(xNames);
+   // debugger
+   // console.log(dataMarried, function(d, i) {return i;});
+
 	ageBins 	= d3.histogram()
 					.domain(xScaleAge.domain())
 					.thresholds(xScaleAge.ticks(ticksHist))
@@ -245,6 +282,7 @@ function initCommonHist() {
 					.thresholds(xScaleEdu.ticks(ticksHist))
 					(dataEdu);
 
+
 	yScaleAge   = d3.scaleLinear()
 			  		.domain([0, d3.max(ageBins, function(d){return d.length;})])
 	          		.range([svg_height, 0]);
@@ -260,6 +298,13 @@ function initCommonHist() {
 	yScaleEdu 	= d3.scaleLinear()
 					.domain([0, d3.max(eduBins, function(d){return d.length;})])
 					.range([svg_height, 0]);
+
+    yScaleMarried = d3.scaleLinear()
+                      .rangeRound([svg_height, 0])
+                      .domain([0, d3.max(yValues)]);
+    // debugger
+    //console.log(d3.max(dataMarried, function(d,i) { return dataMarried[i];}));
+
 }
 
 function initCommonPie() {
@@ -267,6 +312,54 @@ function initCommonPie() {
 	pieWage = d3.pie().value(function(d) {return d.length;});
 	pieExper = d3.pie().value(function(d) {return d.length;});
 	pieEdu = d3.pie().value(function(d) {return d.length;});
+	pieMarried = d3.pie().value(function(d) {return d.value;})
+}
+
+function initBarChart() {
+    var g = canvas.append("g");
+
+    g.append("g")
+      .attr("class", "axis axis--x")
+      .attr("transform", "translate(0," + svg_height + ")")
+      .call(d3.axisBottom(xScaleMarried));
+
+    g.append("g")
+      .attr("class", "axis axis--y")
+      .call(d3.axisLeft(yScaleMarried).ticks(10))
+      .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", "0.71em")
+      .attr("text-anchor", "end")
+      .text("Frequency");
+
+    g.selectAll("rect")
+        .data(dataMarried)
+        .enter().append("rect")
+        .attr("class", "bar")
+        .attr("x", function(d){return xScaleMarried(d.name);})
+        .attr("y", function(d){return yScaleMarried(d.value);})
+        .attr("width", xScaleMarried.bandwidth())
+        .attr("height", function(d) { return (svg_height - yScaleMarried(d.value));} )
+        .attr("fill", "lightblue")
+        .on("mouseover" , function(d) {
+            d3.select(this)
+                .transition()
+                .delay(170)
+                .attr("x", xScaleMarried(d.name) - 5)
+                .attr("width", xScaleMarried.bandwidth() + 10)
+                .attr("fill", "orangered");
+            toolTip.show(d.value);
+          })
+        .on("mouseout", function(d){
+            d3.select(this)
+                .transition()
+                .delay(170)
+                .attr("x", xScaleMarried(d.name) + 5)
+                .attr("width", xScaleMarried.bandwidth() - 10)
+                .attr("fill", "lightblue");
+            toolTip.hide();
+        });
 }
 
 function initHistogram () {
@@ -384,6 +477,9 @@ function initPieChart() {
 	} else if (attrType == "educ") {
 		pie = pieEdu;
 		data = eduBins;
+	} else if (attrType == "married") {
+        pie = pieMarried;
+        data = dataMarried;
 	}
 
 	pieBins = data;
@@ -438,7 +534,11 @@ function  handleMouseOverPie(d,i) {
             })
             .attr("text-anchor", "middle")
             .text(function() {
-                return '[' + pieBins[i].x0 + "-" + pieBins[i].x1 + '] : ' + d.value + ' elements';
+                if (attrType == "married") {
+                   return pieBins[i].name + " : " + d.value;
+                } else {
+                   return '[' + pieBins[i].x0 + "-" + pieBins[i].x1 + '] : ' + d.value + ' elements';
+                }
             })
             .style("opacity", 0)
             .transition()
