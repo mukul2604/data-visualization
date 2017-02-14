@@ -135,7 +135,7 @@ function initMain() {
 	initCommonPie();
 	initForceCommon();
 
-    
+
 	if (chartType == "bar") {
 	    if (attrType == "married") {
 	        initBarChart();
@@ -482,8 +482,8 @@ function handleMouseOutBar(d) {
 //PIE CHART
 function initPieChart() {
 	var outerRadius = svg_width / 3.5;
-	var innerRadius = outerRadius/2;	
-	
+	var innerRadius = outerRadius/2;
+
 	var pie, data;
 	if (attrType == "age") {
 		pie = pieAge;
@@ -531,7 +531,7 @@ function initPieChart() {
     arcs.on("mouseover", handleMouseOverPie)
         .on("mouseout", handleMouseOutPie);
 
-    
+
 }
 
 
@@ -606,6 +606,7 @@ function generateForceData(data) {
         nodes.push(temp)
     });
 
+
     for (i=0; i < data.length; i++){
         sum += data[i];
     }
@@ -615,17 +616,37 @@ function generateForceData(data) {
     max = parseInt(d3.max(data, function(d) {return d;}));
     median = parseInt(medianData(data));
 
-   // debugger
+    var meanSqr = mean * mean,
+        minSqr = min * min,
+        maxSqr = max * max,
+        medianSqr = median * median;
+
+
+    temp = {'source':min, 'target':mean, 'value':Math.sqrt(Math.abs(meanSqr - minSqr))};
+    links.push(temp);
+    temp = {'source':min, 'target':max, 'value':Math.sqrt(Math.abs(maxSqr - minSqr))};
+    links.push(temp);
+    temp = {'source':min, 'target':median, 'value':Math.sqrt(Math.abs(medianSqr - minSqr))};
+    links.push(temp);
+    temp = {'source':max, 'target':mean, 'value':Math.sqrt(Math.abs(meanSqr - maxSqr))};
+    links.push(temp);
+    temp = {'source':max, 'target':median, 'value':Math.sqrt(Math.abs(medianSqr - maxSqr))};
+    links.push(temp);
+    temp = {'source':mean, 'target':median, 'value':Math.sqrt(Math.abs(medianSqr - meanSqr))};
+    links.push(temp);
+
     for (i=0; i<data.length; i++) {
-       temp = {'source':i, 'target':min, 'value':Math.sqrt(Math.abs(min*min - data[i]*data[i]))};
-       links.push(temp);
-       temp = {'source':i, 'target':max, 'value':Math.sqrt(Math.abs(max*max - data[i]*data[i]))};
-       links.push(temp);
-       temp = {'source':i, 'target':mean, 'value':Math.sqrt(Math.abs(mean*mean - data[i]*data[i]))};
-       links.push(temp);
-       temp = {'source':i, 'target':median, 'value':Math.sqrt(Math.abs(median * median - data[i]*data[i]))};
-       links.push(temp);
+           var sqrVal = data[i] * data[i];
+           temp = {'source':i, 'target':min, 'value':Math.sqrt(Math.abs(minSqr - sqrVal))};
+           links.push(temp);
+           temp = {'source':i, 'target':max, 'value':Math.sqrt(Math.abs(maxSqr - sqrVal))};
+           links.push(temp);
+           temp = {'source':i, 'target':mean, 'value':Math.sqrt(Math.abs(meanSqr - sqrVal))};
+           links.push(temp);
+           temp = {'source':i, 'target':median, 'value':Math.sqrt(Math.abs(medianSqr - sqrVal))};
+           links.push(temp);
     }
+
 
     forceData["nodes"] = nodes;
     forceData["links"] = links;
@@ -635,8 +656,9 @@ function generateForceData(data) {
 
 function filterData(data) {
     var fData = [];
-    data.forEach(function(d, i) {
-        if (i % 2 == 0) {
+
+    data.forEach(function(d) {
+        if ((parseInt(Math.random() * 10000)  % 2) != 0) {
             fData.push(d)
         }
     });
