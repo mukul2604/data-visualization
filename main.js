@@ -697,9 +697,6 @@ function initForceChart() {
                         .force("link", d3.forceLink().id(function(d) { return d.id; }))
                         .force("charge", d3.forceManyBody().strength(function(d) {return -300;}))
                         .force("center", d3.forceCenter(svg_width / 2, svg_height / 2));
-         //                .force("vertical", d3.forceY().strength(0.018))
-    					// .force("horizontal", d3.forceX().strength(0.006));
-                      // ;
 
     var link = canvas.append("g")
                     .attr("class", "links")
