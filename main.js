@@ -583,16 +583,27 @@ function handleMouseOutPie() {
 //
 //Force-directed graph
 
+function medianData(data) {
+    data.sort(function(a,b) {return a - b ;});
+    var half = Math.floor(data.length/2);
+
+    if(data.length % 2)
+        return data[half];
+    else
+        return (data[half-1] + data[half]) / 2.0;
+}
+
 function generateForceData(data) {
     var nodes = [];
     var links = [];
-    var i, mean, min, max, sum = 0;
+    var i, temp, mean, min, max, median, sum = 0;
     var forceData = {};
 
 
+
     data.forEach(function(d, i) {
-        var o = {'id':i, 'value':d}
-        nodes.push(o)
+        temp = {'id':i, 'value':d}
+        nodes.push(temp)
     });
 
     for (i=0; i < data.length; i++){
@@ -602,14 +613,18 @@ function generateForceData(data) {
     mean = parseInt(sum / data.length);
     min = parseInt(d3.min(data, function(d) {return d;}));
     max = parseInt(d3.max(data, function(d) {return d;}));
+    median = parseInt(medianData(data));
 
+   // debugger
     for (i=0; i<data.length; i++) {
-       var o = {'source':i, 'target':min, 'value':Math.sqrt(Math.abs(min*min - data[i]*data[i]))};
-       links.push(o);
-       var o = {'source':i, 'target':max, 'value':Math.sqrt(Math.abs(max*max - data[i]*data[i]))};
-       links.push(o);
-       var o = {'source':i, 'target':mean, 'value':Math.sqrt(Math.abs(mean*mean - data[i]*data[i]))};
-       links.push(o);
+       temp = {'source':i, 'target':min, 'value':Math.sqrt(Math.abs(min*min - data[i]*data[i]))};
+       links.push(temp);
+       temp = {'source':i, 'target':max, 'value':Math.sqrt(Math.abs(max*max - data[i]*data[i]))};
+       links.push(temp);
+       temp = {'source':i, 'target':mean, 'value':Math.sqrt(Math.abs(mean*mean - data[i]*data[i]))};
+       links.push(temp);
+       temp = {'source':i, 'target':median, 'value':Math.sqrt(Math.abs(median * median - data[i]*data[i]))};
+       links.push(temp);
     }
 
     forceData["nodes"] = nodes;
