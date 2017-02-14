@@ -622,18 +622,18 @@ function generateForceData(data) {
         medianSqr = median * median;
 
 
-    temp = {'source':min, 'target':mean, 'value':Math.sqrt(Math.abs(meanSqr - minSqr))};
-    links.push(temp);
-    temp = {'source':min, 'target':max, 'value':Math.sqrt(Math.abs(maxSqr - minSqr))};
-    links.push(temp);
-    temp = {'source':min, 'target':median, 'value':Math.sqrt(Math.abs(medianSqr - minSqr))};
-    links.push(temp);
-    temp = {'source':max, 'target':mean, 'value':Math.sqrt(Math.abs(meanSqr - maxSqr))};
-    links.push(temp);
-    temp = {'source':max, 'target':median, 'value':Math.sqrt(Math.abs(medianSqr - maxSqr))};
-    links.push(temp);
-    temp = {'source':mean, 'target':median, 'value':Math.sqrt(Math.abs(medianSqr - meanSqr))};
-    links.push(temp);
+    // temp = {'source':min, 'target':mean, 'value':Math.sqrt(Math.abs(meanSqr - minSqr))};
+    // links.push(temp);
+    // temp = {'source':min, 'target':max, 'value':Math.sqrt(Math.abs(maxSqr - minSqr))};
+    // links.push(temp);
+    // temp = {'source':min, 'target':median, 'value':Math.sqrt(Math.abs(medianSqr - minSqr))};
+    // links.push(temp);
+    // temp = {'source':max, 'target':mean, 'value':Math.sqrt(Math.abs(meanSqr - maxSqr))};
+    // links.push(temp);
+    // temp = {'source':max, 'target':median, 'value':Math.sqrt(Math.abs(medianSqr - maxSqr))};
+    // links.push(temp);
+    // temp = {'source':mean, 'target':median, 'value':Math.sqrt(Math.abs(medianSqr - meanSqr))};
+    // links.push(temp);
 
 
     for (i=0; i< data.length; i++) {
@@ -695,8 +695,11 @@ function initForceChart() {
 
     simulation = d3.forceSimulation()
                         .force("link", d3.forceLink().id(function(d) { return d.id; }))
-                        .force("charge", d3.forceManyBody())
+                        .force("charge", d3.forceManyBody().strength(function(d) {return -300;}))
                         .force("center", d3.forceCenter(svg_width / 2, svg_height / 2));
+         //                .force("vertical", d3.forceY().strength(0.018))
+    					// .force("horizontal", d3.forceX().strength(0.006));
+                      // ;
 
     var link = canvas.append("g")
                     .attr("class", "links")
