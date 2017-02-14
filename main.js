@@ -26,7 +26,12 @@ var maxTicks;
 var pixelsDragged = 20;
 var pieBins;
 
-//Menu stuff
+//force-directed
+var forceAge = {}, forceWage = {}, forceExper = {}, forceEdu = {};
+var simulation;
+//var forceAge = {}
+
+//Menu stuff hide/show
 window.onclick = function(event) {
   if (!event.target.matches(".dropbtn")) {
     var elements = document.getElementsByClassName("dropdown-content");
@@ -128,7 +133,9 @@ function initMain() {
 	initCanvas();
 	initCommonHist();
 	initCommonPie();
+	initForceCommon();
 
+    
 	if (chartType == "bar") {
 	    if (attrType == "married") {
 	        initBarChart();
@@ -137,8 +144,10 @@ function initMain() {
 		}
 	} else if (chartType == "pie") {
 		initPieChart();
+	} else if (chartType == "force") {
+	    initForceChart();
 	}
-    //initBarChart();
+
 }
 
 
@@ -226,6 +235,8 @@ function handleMouseClickSvg() {
 		d3.select(selectElem).attr("class", "selected");
 		selectElem = document.getElementById("pie");
 		d3.select(selectElem).attr("class", "dropdown");
+	} else {
+	    return;
 	}
 	clearCanvas();
 	initMain()
@@ -568,3 +579,141 @@ function handleMouseOutPie() {
     		.style("opacity", "0");
 }
 
+
+//
+//Force-directed graph
+
+function generateForceData(data) {
+    var nodes = [];
+    var links = [];
+    var i, mean, min, max, sum = 0;
+    var forceData = {};
+
+
+    data.forEach(function(d, i) {
+        var o = {'id':i, 'value':d}
+        nodes.push(o)
+    });
+
+    for (i=0; i < data.length; i++){
+        sum += data[i];
+    }
+
+    mean = parseInt(sum / data.length);
+    min = parseInt(d3.min(data, function(d) {return d;}));
+    max = parseInt(d3.max(data, function(d) {return d;}));
+
+    for (i=0; i<data.length; i++) {
+       var o = {'source':i, 'target':min, 'value':Math.sqrt(Math.abs(min*min - data[i]*data[i]))};
+       links.push(o);
+       var o = {'source':i, 'target':max, 'value':Math.sqrt(Math.abs(max*max - data[i]*data[i]))};
+       links.push(o);
+       var o = {'source':i, 'target':mean, 'value':Math.sqrt(Math.abs(mean*mean - data[i]*data[i]))};
+       links.push(o);
+    }
+
+    forceData["nodes"] = nodes;
+    forceData["links"] = links;
+
+    return forceData;
+}
+
+function filterData(data) {
+    var fData = [];
+    data.forEach(function(d, i) {
+        if (i % 2 == 0) {
+            fData.push(d)
+        }
+    });
+    return fData;
+}
+
+
+function initForceCommon() {
+    forceAge = generateForceData(filterData(dataAge));
+    forceWage = generateForceData(filterData(dataWage));
+    forceExper = generateForceData(filterData(dataExper));
+    forceEdu = generateForceData(filterData(dataEdu));
+}
+
+
+
+function initForceChart() {
+    var data;
+    if (attrType == "age") {
+        data = forceAge;
+    } else if (attrType == "wage") {
+       data = forceWage;
+    } else if (attrType == "exper") {
+       data = forceExper;
+    } else if (attrType == "educ") {
+        data =  forceEdu;
+    }
+    console.log(data);
+
+    var color = d3.scaleOrdinal(d3.schemeCategory20);
+
+    simulation = d3.forceSimulation()
+                        .force("link", d3.forceLink().id(function(d) { return d.id; }))
+                        .force("charge", d3.forceManyBody())
+                        .force("center", d3.forceCenter(svg_width / 2, svg_height / 2));
+
+    var link = canvas.append("g")
+                    .attr("class", "links")
+                    .selectAll("line")
+                    .data(data.links)
+                    .enter().append("line")
+                    .attr("stroke-width", function(d) { return Math.sqrt(d.value); });
+
+    var node = canvas.append("g")
+                   .attr("class", "nodes")
+                   .selectAll("circle")
+                   .data(data.nodes)
+                   .enter()
+                        .append("circle")
+                        .attr("r", 5)
+                        .attr("fill", function(d) { return color(d.value); })
+                        .call(d3.drag()
+                          .on("start", dragstartedForce)
+                          .on("drag", draggedForce)
+                          .on("end", dragendedForce));
+
+    node.append("title")
+         .text(function(d) { return d.id; });
+
+    simulation
+            .nodes(data.nodes)
+            .on("tick", ticked);
+
+    simulation.force("link")
+        .links(data.links);
+
+    function ticked() {
+        link
+            .attr("x1", function(d) { return d.source.x; })
+            .attr("y1", function(d) { return d.source.y; })
+            .attr("x2", function(d) { return d.target.x; })
+            .attr("y2", function(d) { return d.target.y; });
+
+        node
+            .attr("cx", function(d) { return d.x; })
+            .attr("cy", function(d) { return d.y; });
+    }
+}
+
+function dragstartedForce(d) {
+  if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+  d.fx = d.x;
+  d.fy = d.y;
+}
+
+function draggedForce(d) {
+  d.fx = d3.event.x;
+  d.fy = d3.event.y;
+}
+
+function dragendedForce(d) {
+  if (!d3.event.active) simulation.alphaTarget(0);
+  d.fx = null;
+  d.fy = null;
+}
