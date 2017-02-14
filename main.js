@@ -635,7 +635,8 @@ function generateForceData(data) {
     temp = {'source':mean, 'target':median, 'value':Math.sqrt(Math.abs(medianSqr - meanSqr))};
     links.push(temp);
 
-    for (i=0; i<data.length; i++) {
+
+    for (i=0; i< data.length; i++) {
            var sqrVal = data[i] * data[i];
            temp = {'source':i, 'target':min, 'value':Math.sqrt(Math.abs(minSqr - sqrVal))};
            links.push(temp);
@@ -658,19 +659,21 @@ function filterData(data) {
     var fData = [];
 
     data.forEach(function(d) {
-        if ((parseInt(Math.random() * 10000)  % 2) != 0) {
-            fData.push(d)
+        if ((parseInt(Math.random() * 1000)  % 4) != 0) {
+            fData.push(d);
         }
     });
+
     return fData;
 }
 
 
 function initForceCommon() {
-    forceAge = generateForceData(filterData(dataAge));
-    forceWage = generateForceData(filterData(dataWage));
-    forceExper = generateForceData(filterData(dataExper));
-    forceEdu = generateForceData(filterData(dataEdu));
+    var min = 1, max = 100;
+    forceAge = generateForceData(filterData(dataAge.slice(min,max)));
+    forceWage = generateForceData(filterData(dataWage.slice(min,max)));
+    forceExper = generateForceData(filterData(dataExper.slice(min,max)));
+    forceEdu = generateForceData(filterData(dataEdu.slice(min,max)));
 }
 
 

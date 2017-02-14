@@ -134,6 +134,7 @@
 .links line {
   stroke: #888;
   stroke-opacity: 0.6;
+  stroke-width:1px;
 }
 
 .nodes circle {
