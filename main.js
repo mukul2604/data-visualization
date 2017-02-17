@@ -621,21 +621,6 @@ function generateForceData(data) {
         maxSqr = max * max,
         medianSqr = median * median;
 
-
-    // temp = {'source':min, 'target':mean, 'value':Math.sqrt(Math.abs(meanSqr - minSqr))};
-    // links.push(temp);
-    // temp = {'source':min, 'target':max, 'value':Math.sqrt(Math.abs(maxSqr - minSqr))};
-    // links.push(temp);
-    // temp = {'source':min, 'target':median, 'value':Math.sqrt(Math.abs(medianSqr - minSqr))};
-    // links.push(temp);
-    // temp = {'source':max, 'target':mean, 'value':Math.sqrt(Math.abs(meanSqr - maxSqr))};
-    // links.push(temp);
-    // temp = {'source':max, 'target':median, 'value':Math.sqrt(Math.abs(medianSqr - maxSqr))};
-    // links.push(temp);
-    // temp = {'source':mean, 'target':median, 'value':Math.sqrt(Math.abs(medianSqr - meanSqr))};
-    // links.push(temp);
-
-
     for (i=0; i< data.length; i++) {
            var sqrVal = data[i] * data[i];
            temp = {'source':i, 'target':min, 'value':Math.sqrt(Math.abs(minSqr - sqrVal))};
