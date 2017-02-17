@@ -27,9 +27,9 @@ var pixelsDragged = 20;
 var pieBins;
 
 //force-directed
-var forceAge = {}, forceWage = {}, forceExper = {}, forceEdu = {};
+var forceAge = {}, forceWage = {}, forceExper = {}, forceEdu = {},  forceMarried = {};
 var simulation;
-//var forceAge = {}
+
 
 //Menu stuff hide/show
 window.onclick = function(event) {
@@ -134,7 +134,17 @@ function initMain() {
 	initCommonHist();
 	initCommonPie();
 	initForceCommon();
+	var textg = canvas.append("g");
 
+	textg.append("text")
+	       .attr("x", 20)
+	       .attr("y", -50)
+	       .text("ChartType:"+ " "+ chartType);
+
+	textg.append("text")
+	       .attr("x", 20)
+	       .attr("y", -30)
+	       .text("Attribute:"+ " "+ attrType);
 
 	if (chartType == "bar") {
 	    if (attrType == "married") {
@@ -279,8 +289,7 @@ function initCommonHist() {
     xScaleMarried = d3.scaleBand()
                         .rangeRound([0, svg_width]).padding(0.1)
                         .domain(xNames);
-   // debugger
-   // console.log(dataMarried, function(d, i) {return i;});
+
 
 	ageBins 	= d3.histogram()
 					.domain(xScaleAge.domain())
@@ -322,9 +331,6 @@ function initCommonHist() {
     yScaleMarried = d3.scaleLinear()
                       .rangeRound([svg_height, 0])
                       .domain([0, d3.max(yValues)]);
-    // debugger
-    //console.log(d3.max(dataMarried, function(d,i) { return dataMarried[i];}));
-
 }
 
 function initCommonPie() {
@@ -428,13 +434,24 @@ function initHistogram () {
     canvas.append("g").append("text")
       .attr("transform",
             "translate(" + (svg_width/2) + " ," +
-                           (svg_height + svg_margin.top + 20) + ")")
+                           (svg_height + 27) + ")")
       .style("text-anchor", "middle")
-      .text("Age in years");
+      .style("font-size", 15)
+      .text(function(){if (attrType == "wage") return "dollar per hour"; else return "years";});
+
 
   	canvas.append("g")
       .call(d3.axisLeft(yScale));
 
+    canvas.append("g")
+        .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 0 - svg_margin.left)
+            .attr("x",0 - (svg_height / 2))
+            .attr("dy", "1.2em")
+            .style("text-anchor", "middle")
+            .style("font-size", 15)
+            .text("frequency");
 }
 
 
@@ -547,8 +564,8 @@ function  handleMouseOverPie(d,i) {
         .select("#value")
         .text(d.value);
 
-    canvas.append('text')
-    		.attr('class', 'pietext')
+    canvas.append("text")
+    		.attr("class", "pietext")
             .attr("transform", function(d) {
                 return "translate(" + svg_width/2 + "," + svg_height/2 + ")";
             })
@@ -557,7 +574,7 @@ function  handleMouseOverPie(d,i) {
                 if (attrType == "married") {
                    return pieBins[i].name + " : " + d.value;
                 } else {
-                   return '[' + pieBins[i].x0 + "-" + pieBins[i].x1 + '] : ' + d.value + ' elements';
+                   return "[" + pieBins[i].x0 + "-" + pieBins[i].x1 + "] : " + d.value + " elements";
                 }
             })
             .style("opacity", 0)
@@ -573,7 +590,7 @@ function handleMouseOutPie() {
 		.delay(200)
         .style("opacity", 0);
 
-    canvas.selectAll("text")
+    canvas.selectAll("text.pietext")
     		.transition()
     		.delay(100)
     		.style("opacity", "0");
@@ -602,7 +619,7 @@ function generateForceData(data) {
 
 
     data.forEach(function(d, i) {
-        temp = {'id':i, 'value':d}
+        temp = {"id":i, "value":d}
         nodes.push(temp)
     });
 
@@ -623,13 +640,13 @@ function generateForceData(data) {
 
     for (i=0; i< data.length; i++) {
            var sqrVal = data[i] * data[i];
-           temp = {'source':i, 'target':min, 'value':Math.sqrt(Math.abs(minSqr - sqrVal))};
+           temp = {"source":i, "target":min, "value":Math.sqrt(Math.abs(minSqr - sqrVal))};
            links.push(temp);
-           temp = {'source':i, 'target':max, 'value':Math.sqrt(Math.abs(maxSqr - sqrVal))};
+           temp = {"source":i, "target":max, "value":Math.sqrt(Math.abs(maxSqr - sqrVal))};
            links.push(temp);
-           temp = {'source':i, 'target':mean, 'value':Math.sqrt(Math.abs(meanSqr - sqrVal))};
+           temp = {"source":i, "target":mean, "value":Math.sqrt(Math.abs(meanSqr - sqrVal))};
            links.push(temp);
-           temp = {'source':i, 'target':median, 'value':Math.sqrt(Math.abs(medianSqr - sqrVal))};
+           temp = {"source":i, "target":median, "value":Math.sqrt(Math.abs(medianSqr - sqrVal))};
            links.push(temp);
     }
 
@@ -652,6 +669,34 @@ function filterData(data) {
     return fData;
 }
 
+function generateForceMarriedData(data) {
+    var nodes = [];
+    var links = [];
+    var forceMarriedData = {};
+    var temp;
+    var center = 0;
+
+    temp = {"id":0, "value":0};
+    nodes.push(temp)
+
+    for (var i = 0 ; i < data.length; i++) {
+        temp = {"id":i+1, "value":data[i]};
+        nodes.push(temp)
+
+    }
+
+    temp = {"source":0, "target":center, "value":10};
+    links.push(temp);
+
+    for (var i=0; i < data.length; i++) {
+        temp = {"source":i+1, "target":center, "value":data[i].value};
+        links.push(temp);
+    }
+
+    forceMarriedData["nodes"] = nodes;
+    forceMarriedData["links"] = links;
+    return forceMarriedData;
+}
 
 function initForceCommon() {
     var min = 1, max = 100;
@@ -659,6 +704,7 @@ function initForceCommon() {
     forceWage = generateForceData(filterData(dataWage.slice(min,max)));
     forceExper = generateForceData(filterData(dataExper.slice(min,max)));
     forceEdu = generateForceData(filterData(dataEdu.slice(min,max)));
+    forceMarried = generateForceMarriedData(dataMarried);
 }
 
 
@@ -673,14 +719,16 @@ function initForceChart() {
        data = forceExper;
     } else if (attrType == "educ") {
         data =  forceEdu;
+    } else if (attrType == "married") {
+        data =  forceMarried;
     }
-    console.log(data);
 
     var color = d3.scaleOrdinal(d3.schemeCategory20);
 
     simulation = d3.forceSimulation()
                         .force("link", d3.forceLink().id(function(d) { return d.id; }))
-                        .force("charge", d3.forceManyBody().strength(function(d) {return -300;}))
+                        .force("charge", d3.forceManyBody()
+                            .strength(function(d) {if (attrType == "married") return -2000; else return -300;}))
                         .force("center", d3.forceCenter(svg_width / 2, svg_height / 2));
 
     var link = canvas.append("g")
@@ -697,14 +745,18 @@ function initForceChart() {
                    .enter()
                         .append("circle")
                         .attr("r", 5)
-                        .attr("fill", function(d) { return color(d.value); })
+                        .attr("fill", function(d) { if (attrType == "married") {
+                                                        return color(d.value.value);
+                                                    } else {
+                                                        return color(d.value);
+                                                    }})
                         .call(d3.drag()
                           .on("start", dragstartedForce)
                           .on("drag", draggedForce)
                           .on("end", dragendedForce));
 
     node.append("title")
-         .text(function(d) { return d.id; });
+         .text(function(d) { if (attrType == "married") return d.value.name; else return d.value; });
 
     simulation
             .nodes(data.nodes)
