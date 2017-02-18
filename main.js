@@ -1,13 +1,14 @@
-var dataWage = [];
-var dataAge = [];
-var dataExper = [];
-var dataEdu = [];
-var dataMarried = [];
+var dataWage = [],
+	dataAge = [],
+	dataExper = [],
+	dataEdu = [],
+	dataMarried = [];
 
 var canvas;
 var canvasWidth = 850;
 var canvasHeight = 700;
 var whiteSpace = 2
+
 var xScaleAge, yScaleAge,
 	xScaleWage, yScaleWage,
 	xScaleExper, yScaleExper,

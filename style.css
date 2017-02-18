@@ -73,10 +73,10 @@
 .d3-tip {
       line-height: 1;
       padding: 6px;
-      background: rgba(0, 0, 0, 0.9);
-      color: #fff;
+      background: white;
+      color: ;
       border-radius: 4px;
-      font-size: 12px;
+      font-size: 18px;
 }
  
 /* Creates a small triangle extender for the tooltip */
